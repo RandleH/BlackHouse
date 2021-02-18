@@ -12,7 +12,6 @@ extern "C" {
 /*=====================================================================
 > Data Structure Reference
 ======================================================================*/
- 
 struct __LinkLoopNode{
     void*        object;
     const struct __LinkLoopNode* const pNext; // Can NOT be modified by user.
@@ -32,6 +31,22 @@ E_Status_t MAKE_FUNC( LINK_Loop , deleteNode            ) (   __LinkLoopNode  *c
 E_Status_t MAKE_FUNC( LINK_Loop , removeNode            ) (   __LinkLoopNode  *const* ppHeadNode , __LinkLoopNode *const* ppTarget   );
 E_Status_t MAKE_FUNC( LINK_Loop , removeAllNodes        ) (   __LinkLoopNode  *const* ppHeadNode );
 E_Status_t MAKE_FUNC( LINK_Loop , printAllNodesAdr      ) (   __LinkLoopNode  *const* ppHeadNode , int(*PRINTF_FUNC)(const char*,...));
+
+struct __LinkBiTreeNode{
+    void*        object;
+    const struct __LinkBiTreeNode* const pLeft;  // Can NOT be modified by user.
+    const struct __LinkBiTreeNode* const pRight; // Can NOT be modified by user.
+    const struct __LinkBiTreeNode* const pPrev;  // Can NOT be modified by user.
+};
+typedef struct __LinkBiTreeNode __LinkBiTreeNode;
+
+E_Status_t MAKE_FUNC( LINK_BiTree , createNode           ) ( __LinkBiTreeNode ** ptr );
+E_Status_t MAKE_FUNC( LINK_BiTree , createHeadNode       ) ( __LinkBiTreeNode ** ptr );
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2r          ) ( __LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew);
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2l          ) ( __LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew);
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2l          ) ( __LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew);
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2r          ) ( __LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew);
+E_Status_t MAKE_FUNC( LINK_BiTree , findNode             ) ( __LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget );
 
 #ifdef __cplusplus
 }

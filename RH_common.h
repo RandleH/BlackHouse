@@ -35,7 +35,8 @@ typedef enum{
 }E_Status_t;
   
  
-#define MAKE_FUNC( class , method )          __##class##_##method
+#define MAKE_FUNC( class , method )          __##class##_##method  // Function like this: __XXXX_xxxxx();
+#define CALL_FUNC                            MAKE_FUNC             // exactly the same but has semantic difference.
  
 #ifndef M_2_SQRTPI
 #define M_2_SQRTPI  1.12837916709551257389615890312154517   /* 2/sqrt(pi)     */

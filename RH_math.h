@@ -27,6 +27,23 @@ __Kernel_t*  __gussianKernel   (double __sigma,size_t order,__Kernel_t* pKernel)
 long         __step_mul        (long   x);
 long         __fibonacci       (long   n);
 
+/*=====================================================================
+ > Quantity Reference
+======================================================================*/
+struct IntArray_t{
+    size_t  index;
+    int     value;
+};
+typedef struct IntArray_t IntArray_t;
+IntArray_t __findMax_INT(const int* pValue,size_t num);
+IntArray_t __findMin_INT(const int* pValue,size_t num);
+
+struct UintArray_t{
+    size_t        index;
+    unsigned int  value;
+};
+typedef struct UintArray_t UintArray_t;
+
 /*===========================================================================================================================
 > Geometry Reference
 =============================================================================================================================*/

@@ -9,29 +9,23 @@ extern "C" {
  > Data Structure Reference
 ======================================================================*/
 E_Status_t MAKE_FUNC( LINK_Loop , createNode            )  (__LinkLoopNode **      ptr ){
-    __exitReturn(ptr==NULL, kStatus_BadAccess);
-  
-    *ptr =  (__LinkLoopNode*)__malloc(sizeof(__LinkLoopNode));
-    if(*ptr == NULL)
-        return kStatus_NoSpace;
+    __exitReturn(ptr == NULL  , kStatus_BadAccess );
 
+    *ptr =  (__LinkLoopNode*)__malloc(sizeof(__LinkLoopNode));
+    __exitReturn(*ptr == NULL , kStatus_NoSpace   );
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,*ptr,object ,NULL);
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,*ptr,pNext  ,NULL);
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,*ptr,pPrev  ,NULL);
     return kStatus_Success;
 }
       
 E_Status_t MAKE_FUNC( LINK_Loop , createHeadNode        )  (__LinkLoopNode **      ptr ){
-    __LinkLoopNode* pNode = (__LinkLoopNode*)__malloc(sizeof(__LinkLoopNode));
-    *ptr = pNode;
-  
-    if( pNode == NULL )
-        return kStatus_NoSpace;
+    E_Status_t state = MAKE_FUNC( LINK_Loop , createNode)(ptr);
+    __exitReturn(state!=kStatus_Success, state);
 
-    __SET_STRUCT_MB(__LinkLoopNode,void*       ,pNode,object,NULL );
-    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNode,pNext ,pNode);
-    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNode,pPrev ,pNode);
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,*ptr,pNext  ,*ptr);
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,*ptr,pPrev  ,*ptr);
 
-    // Same Effect: pNode->object = NULL;
-    // Same Effect: pNode->pNext  = pNode;  // But to cope with <const>.
-    // Same Effect: pNode->pPrev  = pNode;  // But to cope with <const>.
     return kStatus_Success;
 }
 
@@ -233,6 +227,152 @@ E_Status_t MAKE_FUNC( LINK_Loop , printAllNodesAdr      )  (__LinkLoopNode *cons
     return kStatus_Success;
 }
       
+    
+    
+E_Status_t MAKE_FUNC( LINK_BiTree , createNode          )  (__LinkBiTreeNode **  ptr ){
+    __exitReturn(ptr==NULL, kStatus_BadAccess );
+    
+    *ptr = (__LinkBiTreeNode*)__malloc(sizeof(__LinkBiTreeNode));
+    __exitReturn(*ptr==NULL, kStatus_NoSpace  );
+    __SET_STRUCT_MB(__LinkBiTreeNode,__LinkBiTreeNode*,*ptr,pLeft  ,NULL);
+    __SET_STRUCT_MB(__LinkBiTreeNode,__LinkBiTreeNode*,*ptr,pRight ,NULL);
+    __SET_STRUCT_MB(__LinkBiTreeNode,__LinkBiTreeNode*,*ptr,pPrev  ,NULL);
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( LINK_BiTree , createHeadNode      )  (__LinkBiTreeNode **  ptr ){
+    E_Status_t state = MAKE_FUNC(LINK_BiTree, createNode)(ptr);
+    __exitReturn(state!=kStatus_Success,state);
+    __SET_STRUCT_MB(__LinkBiTreeNode,__LinkBiTreeNode*,*ptr,pPrev  ,NULL);
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2r         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+    __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
+    __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
+    
+    // Head Node shouldn't have a previous node. So...Not a headnode.
+    __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
+    
+    // Target Node must exist in Tree.
+    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    __exitReturn( state!=kStatus_Success                        , state             );
+    
+    // New Node shouldn't be in Tree.
+    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pRight, (*ppTarget)->pLeft );
+    
+    if( (*ppTarget)->pLeft!=NULL )
+        __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)->pLeft, pPrev , *ppNew             );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)       , pLeft , *ppNew             );
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2l         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+    __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
+    __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
+    
+    // Head Node shouldn't have a previous node. So...Not a headnode.
+    __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
+    
+    // Target Node must exist in Tree.
+    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    __exitReturn( state!=kStatus_Success                        , state             );
+    
+    // New Node shouldn't be in Tree.
+    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pLeft , (*ppTarget)->pLeft );
+    
+    if( (*ppTarget)->pLeft!=NULL )
+        __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)->pLeft, pPrev , *ppNew             );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)       , pLeft , *ppNew             );
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2l         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+    __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
+    __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
+    
+    // Head Node shouldn't have a previous node. So...Not a headnode.
+    __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
+    
+    // Target Node must exist in Tree.
+    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    __exitReturn( state!=kStatus_Success                        , state             );
+    
+    // New Node shouldn't be in Tree.
+    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pLeft , (*ppTarget)->pLeft );
+    
+    if( (*ppTarget)->pLeft!=NULL )
+        __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)->pRight, pPrev , *ppNew             );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)       , pRight, *ppNew             );
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2r         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+    __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
+    __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
+    
+    // Head Node shouldn't have a previous node. So...Not a headnode.
+    __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
+    
+    // Target Node must exist in Tree.
+    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    __exitReturn( state!=kStatus_Success                        , state             );
+    
+    // New Node shouldn't be in Tree.
+    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pRight, (*ppTarget)->pRight);
+    
+    if( (*ppTarget)->pLeft!=NULL )
+        __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)->pRight, pPrev , *ppNew             );
+    
+    __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppTarget)       , pRight, *ppNew             );
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( LINK_BiTree , findNode            )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget ){
+    __exitReturn( ppHead   == NULL                , kStatus_BadAccess );
+    __exitReturn( ppTarget == NULL                , kStatus_BadAccess );
+    __exitReturn(*ppHead==NULL || *ppTarget==NULL , kStatus_NotFound  );
+    
+    E_Status_t state = kStatus_NotFound;
+    
+    if(*ppHead == *ppTarget){
+        return kStatus_Success;
+    }else{
+        __LinkBiTreeNode **p = (__LinkBiTreeNode **)(&((*ppHead)->pLeft));
+        state =  CALL_FUNC( LINK_BiTree , findNode )( p , ppTarget );
+    }
+    
+    if(state != kStatus_Success){
+        __LinkBiTreeNode **p = (__LinkBiTreeNode **)(&((*ppHead)->pRight));
+        state =  CALL_FUNC( LINK_BiTree , findNode )( p , ppTarget );
+    }
+    
+    return state;
+}
+    
 #ifdef __cplusplus
 }
 #endif

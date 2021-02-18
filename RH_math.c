@@ -134,9 +134,37 @@ long __fibonacci(long n){
 }
 
 /*===========================================================================================================================
+ > Quantity Reference
+============================================================================================================================*/
+struct IntArray_t __findMax_INT(const int* pValue,size_t num){
+    int max = *pValue;
+    int cnt = 0;
+    while(num--){
+        if(*pValue > max)
+            max = *pValue;
+        pValue++;
+        cnt++;
+    }
+    struct IntArray_t result = {.index = cnt,.value = max};
+    return result;
+}
+
+struct IntArray_t __findMin_INT(const int* pValue,size_t num){
+    int min = *pValue;
+    int cnt = 0;
+    while(num--){
+        if(*pValue < min)
+            min = *pValue;
+        pValue++;
+        cnt++;
+    }
+    struct IntArray_t result = {.index = cnt,.value = min};
+    return result;
+}
+    
+/*===========================================================================================================================
  > Geometry Reference
 ============================================================================================================================*/
-
 Point3D_t __findPoint_VectorDistance (const Point3D_t*  A,const Point3D_t*  B,int dist_AP){
     long dist_AB = lroundl(sqrt( (B->x - A->x)*(B->x - A->x) + \
                                 (B->y - A->y)*(B->y - A->y) + \
