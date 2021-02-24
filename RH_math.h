@@ -20,6 +20,8 @@ long         __sign            (long   x);
 long         __step            (long   x);
 long         __sqrt            (long   x);
 double       __sigmold         (double x);
+double       __cordic_acos     (long   x,long p     );//
+double       __cordic_acot     (long   y,long x     );
 double       __cordic_atan     (long   y,long x     );
 double       __gussian         (long   x,long __miu  ,double __sigma);
 double       __gussian2D       (long   x,long y      ,double __sigma);
