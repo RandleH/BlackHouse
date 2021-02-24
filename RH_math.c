@@ -2,9 +2,9 @@
 
 #include "RH_math.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
 /*===========================================================================================================================
  > Algebra Reference
 ============================================================================================================================*/
@@ -35,10 +35,50 @@ long __sqrt(long x){
     return (res+1);
 }
 
-double __cordic_acos(long x,long p){
-    __exitReturn( x>p , 0 );
-    return 0.0;
+double __cordic_tan(double a){
+     const static uint16_t angle_256[] = {
+        // When 1 deg = 256, then...
+        
+        11520 , // Φ = 45               tan(Φ) = 1/1    
+        6801  , // Φ = 26.565051177078  tan(Φ) = 1/2    
+        3593  , // Φ = 14.036243467927  tan(Φ) = 1/4    
+        1824  , // Φ = 26.565051177078  tan(Φ) = 1/8    
+        916   , // Φ = 26.565051177078  tan(Φ) = 1/16   
+        458   , // Φ = 26.565051177078  tan(Φ) = 1/32   
+        229   , // Φ = 26.565051177078  tan(Φ) = 1/64   
+        115   , // Φ = 26.565051177078  tan(Φ) = 1/128  
+        57    , // Φ = 26.565051177078  tan(Φ) = 1/256  
+        29    , // Φ = 26.565051177078  tan(Φ) = 1/512  
+        14    , // Φ = 26.565051177078  tan(Φ) = 1/1024 
+        7     , // Φ = 26.565051177078  tan(Φ) = 1/2048 
+        4     , // Φ = 26.565051177078  tan(Φ) = 1/4096 
+        2     , // Φ = 26.565051177078  tan(Φ) = 1/8192 
+        1       // Φ = 26.565051177078  tan(Φ) = 1/16384
+    };
 
+    long x = 0xffff;
+    long y = 0;
+    long angle_tar = lround(a*256);
+    long angle_sum = 0;
+    long x_tmp = 0,y_tmp = 0;
+    
+    for( int i=0; i<15; i++ ){
+        if( angle_tar < angle_sum ){ // cw
+            x_tmp = (x + (y>>i));
+            y_tmp = (y - (x>>i));
+            x  = x_tmp;
+            y  = y_tmp;
+            angle_sum -= angle_256[i];
+        }else{ // ccw
+            x_tmp = (x - (y>>i));
+            y_tmp = (y + (x>>i));
+            x  = x_tmp;
+            y  = y_tmp;
+            angle_sum += angle_256[i];
+        }
+    }
+
+    return y/((double)(x));
 }
 
 double __cordic_acot(long y,long x){
@@ -73,7 +113,7 @@ double __cordic_atan(long y,long x){
     __exitReturn( x==y         ,   45 );
     __exitReturn( x==-y        ,  -45 );
 
-    long angle_sum = 0.0;
+    long angle_sum = 0;
     long x_tmp,y_tmp;
     
     y<<=10;
