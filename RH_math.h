@@ -21,6 +21,7 @@ long         __step            (long   x);
 long         __sqrt            (long   x);
 double       __sigmold         (double x);
 double       __cordic_tan      (double a);//
+double __cordic_tan1(double a);
 double       __cordic_acot     (long   y,long x     );
 double       __cordic_atan     (long   y,long x     );
 
