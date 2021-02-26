@@ -42,6 +42,13 @@ union __UNION_PixelRGB888_t{
 typedef struct  __PixelRGB888_t         __PixelRGB888_t;
 typedef union   __UNION_PixelRGB888_t   __UNION_PixelRGB888_t;
 
+struct __ImageBIN_t{
+    bool*       pBuffer;
+    size_t      width;
+    size_t      height;
+};
+typedef struct __ImageBIN_t  __ImageBIN_t;
+
 struct __ImageRGB565_t{
     __UNION_PixelRGB565_t* pBuffer;
     size_t      width;

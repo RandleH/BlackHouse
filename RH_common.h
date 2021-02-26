@@ -33,7 +33,6 @@ typedef enum{
     kStatus_ErrorID    ,
     kStatus_NotFound   ,
 }E_Status_t;
-  
  
 #define MAKE_FUNC( class , method )          __##class##_##method  // Function like this: __XXXX_xxxxx();
 #define CALL_FUNC                            MAKE_FUNC             // exactly the same but has semantic difference.
@@ -127,32 +126,33 @@ typedef enum{
 #define __free(x)                            free(x)    //__freeHEAP(x)
  
  
-#define __MEM_BYTE( adr )              ( (*( (uint8_t* )(adr) )) )
-#define __MEM_WORD( adr )              ( (*( (uint16_t*)(adr) )) )
- 
-#define __PTR_BYTE( var )              ( (uint8_t* ) (void* ) (&(var)) )
-#define __PTR_WORD( var )              ( (uint8_t* ) (void* ) (&(var)) )
-
-#define __WORD_HI( var )               ( (uint8_t)( (uint16_t)(var) >> 8   ) )
-#define __WORD_LO( var )               ( (uint8_t)( (uint16_t)(var) & 0xff ) )
-
-#define __RND4 ( x )                   ( ( ((x)+3)  >>2 )<<2 )
-#define __RND8 ( x )                   ( ( ((x)+7)  >>3 )<<3 )
-#define __RND16( x )                   ( ( ((x)+15) >>4 )<<4 )
-
-#define __UPCASE( c )                  ( ((c) >= 'a' && (c) <= 'z') ? ((c)-0x20) : (c) )
-
-#define __INC_SAT( val )               ( ( ((val)+1) > (val) ) ? ((val)+1) : (val) )
+#define __MEM_BYTE( adr )                    ( (*( (uint8_t* )(adr) )) )
+#define __MEM_WORD( adr )                    ( (*( (uint16_t*)(adr) )) )
+       
+#define __PTR_BYTE( var )                    ( (uint8_t*  ) (void* ) (&(var)) )
+#define __PTR_WORD( var )                    ( (uint16_t* ) (void* ) (&(var)) )
+#define __PTR_TYPE( var, type )              ( (type*     ) (void* ) (&(var)) )
+      
+#define __WORD_HI( var )                     ( (uint8_t)( (uint16_t)(var) >> 8   ) )
+#define __WORD_LO( var )                     ( (uint8_t)( (uint16_t)(var) & 0xff ) )
+      
+#define __RND4 ( x )                         ( ( ((x)+3)  >>2 )<<2 )
+#define __RND8 ( x )                         ( ( ((x)+7)  >>3 )<<3 )
+#define __RND16( x )                         ( ( ((x)+15) >>4 )<<4 )
+      
+#define __UPCASE( c )                        ( ((c) >= 'a' && (c) <= 'z') ? ((c)-0x20) : (c) )
+      
+#define __INC_SAT( val )                     ( ( ((val)+1) > (val) ) ? ((val)+1) : (val) )
  
 #define __SET_STRUCT_MB( s_type, var_type, s_ptr, s_mem, val )   *( (var_type*) ( ((unsigned char*)(s_ptr))+(offsetof(s_type, s_mem)) ) ) = (var_type)(val)
 
-#define __IN_BYTE  ( port )            ( *((volatile uint8_t*  )(port)) )
-#define __IN_WORD  ( port )            ( *((volatile uint16_t* )(port)) )
-#define __IN_DWORD ( port )            ( *((volatile uint32_t* )(port)) )
-
-#define __OUT_BYTE  ( port, val )      ( *((volatile uint8_t*  )(port)) = ((uint8_t )(val)) )
-#define __OUT_WORD  ( port, val )      ( *((volatile uint16_t* )(port)) = ((uint16_t)(val)) )
-#define __OUT_DWORD ( port, val )      ( *((volatile uint32_t* )(port)) = ((uint32_t)(val)) )
+#define __IN_BYTE  ( port )                  ( *((volatile uint8_t*  )(port)) )
+#define __IN_WORD  ( port )                  ( *((volatile uint16_t* )(port)) )
+#define __IN_DWORD ( port )                  ( *((volatile uint32_t* )(port)) )
+      
+#define __OUT_BYTE  ( port, val )            ( *((volatile uint8_t*  )(port)) = ((uint8_t )(val)) )
+#define __OUT_WORD  ( port, val )            ( *((volatile uint16_t* )(port)) = ((uint16_t)(val)) )
+#define __OUT_DWORD ( port, val )            ( *((volatile uint32_t* )(port)) = ((uint32_t)(val)) )
 
 #ifdef __cplusplus
  }
