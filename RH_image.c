@@ -1,5 +1,5 @@
 
-
+#include <stdio.h>
 #include "RH_image.h"
 
 #ifdef __cplusplus
