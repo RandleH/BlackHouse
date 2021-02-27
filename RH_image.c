@@ -314,9 +314,15 @@ __ImageRGB888_t* __Blur_Gussian_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
     return pImg;
 
 }
-
+    
 __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB888_t* dst,uint32_t radSize, uint16_t br_100){
-//    __exitReturn(src == NULL || dst == NULL , NULL);
+    __exitReturn(src == NULL || dst == NULL , NULL);
+    
+    __UNION_PixelRGB888_t* pSrcData = src->pBuffer;
+    __UNION_PixelRGB888_t* pDstData = dst->pBuffer;
+    if(pSrcData == dst->pBuffer){
+        pDstData = __malloc(src->height*src->width*sizeof(__UNION_PixelRGB888_t));
+    }
     
     double sigma  = __map(radSize, 0, 65535, 0.0, 10.0); // convert a normal value to sigma
     size_t order  = lround(sigma*6); // 6 times sigma includes 99% area.
@@ -333,13 +339,13 @@ __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
     div = half_order * half_order;
     for(int n=0;n<half_order;n++){
         for(int m=0;m<half_order;m++){
-            sum_R += __array1D(src->pBuffer, src->width, n, m)->R;
-            sum_G += __array1D(src->pBuffer, src->width, n, m)->G;
-            sum_B += __array1D(src->pBuffer, src->width, n, m)->B;
+            sum_R += __array1D(pSrcData, src->width, n, m)->R;
+            sum_G += __array1D(pSrcData, src->width, n, m)->G;
+            sum_B += __array1D(pSrcData, src->width, n, m)->B;
         }
     }
     div = half_order * half_order;
-//    printf("div = %ld , sum_R = %ld\n",div,sum_R);
+
     // Average Filter
     for(int j=0;j<src->height;j++){
         for(int i=0;i<src->width;i++){
@@ -351,9 +357,9 @@ __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
                     if(i-half_order >= 0){                                          // [!] no cross the broad [0,src->width-1]
                         for(int row=j-half_order+1;row<=j+half_order-1;row++){
                             if( row<src->height && row>=0 ){                       // [!] no cross the broad [0,src->height-1]
-                                sum_R -= __array1D(src->pBuffer, src->width, row, i-half_order)->R;
-                                sum_G -= __array1D(src->pBuffer, src->width, row, i-half_order)->G;
-                                sum_B -= __array1D(src->pBuffer, src->width, row, i-half_order)->B;
+                                sum_R -= __array1D(pSrcData, src->width, row, i-half_order)->R;
+                                sum_G -= __array1D(pSrcData, src->width, row, i-half_order)->G;
+                                sum_B -= __array1D(pSrcData, src->width, row, i-half_order)->B;
                                 div--;
                             }
                         }
@@ -363,19 +369,18 @@ __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
                     if( i+half_order-1 < src->width ){                             // [!] no cross the broad [0,src->width-1]
                         for(int row=j-half_order+1;row<=j+half_order-1;row++){
                             if( row<src->height && row>=0 ){                       // [!] no cross the broad [0,src->height-1]
-                                sum_R += __array1D(src->pBuffer, src->width, row, i+half_order-1)->R;
-                                sum_G += __array1D(src->pBuffer, src->width, row, i+half_order-1)->G;
-                                sum_B += __array1D(src->pBuffer, src->width, row, i+half_order-1)->B;
+                                sum_R += __array1D(pSrcData, src->width, row, i+half_order-1)->R;
+                                sum_G += __array1D(pSrcData, src->width, row, i+half_order-1)->G;
+                                sum_B += __array1D(pSrcData, src->width, row, i+half_order-1)->B;
                                 div++;
                             }
                         }
                     }
                     
                 }
-//                printf("[%2ld , %4ld] ",div,sum_R);
-                __array1D(dst->pBuffer, src->width, j, i)->R = sum_R*br_100/(div*100);
-                __array1D(dst->pBuffer, src->width, j, i)->G = sum_G*br_100/(div*100);
-                __array1D(dst->pBuffer, src->width, j, i)->B = sum_B*br_100/(div*100);
+                __array1D(pDstData, src->width, j, i)->R = sum_R*br_100/(div*100);
+                __array1D(pDstData, src->width, j, i)->G = sum_G*br_100/(div*100);
+                __array1D(pDstData, src->width, j, i)->B = sum_B*br_100/(div*100);
             }else{ // Scan Direction:  [new] <--<-- [old]
                 int k = (int)(src->width)-i-1; // reverse i
                 // Remove rightmost column because it is old.
@@ -383,9 +388,9 @@ __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
                     if(k+half_order < src->width ){                                // [!] no cross the broad [0,src->width-1]
                         for(int row=j-half_order+1;row<=j+half_order-1;row++){
                             if( row<src->height && row>=0 ){                       // [!] no cross the broad [0,src->height-1]
-                                sum_R -= __array1D(src->pBuffer, src->width, row, k+half_order)->R;
-                                sum_G -= __array1D(src->pBuffer, src->width, row, k+half_order)->G;
-                                sum_B -= __array1D(src->pBuffer, src->width, row, k+half_order)->B;
+                                sum_R -= __array1D(pSrcData, src->width, row, k+half_order)->R;
+                                sum_G -= __array1D(pSrcData, src->width, row, k+half_order)->G;
+                                sum_B -= __array1D(pSrcData, src->width, row, k+half_order)->B;
                                 div--;
                             }
                         }
@@ -395,38 +400,36 @@ __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
                     if(k-half_order+1 >=0 ){                                       // [!] no cross the broad [0,src->width-1]
                         for(int row=j-half_order+1;row<=j+half_order-1;row++){
                             if( row<src->height && row>=0 ){                       // [!] no cross the broad [0,src->height-1]
-                                sum_R += __array1D(src->pBuffer, src->width, row, k-half_order+1)->R;
-                                sum_G += __array1D(src->pBuffer, src->width, row, k-half_order+1)->G;
-                                sum_B += __array1D(src->pBuffer, src->width, row, k-half_order+1)->B;
+                                sum_R += __array1D(pSrcData, src->width, row, k-half_order+1)->R;
+                                sum_G += __array1D(pSrcData, src->width, row, k-half_order+1)->G;
+                                sum_B += __array1D(pSrcData, src->width, row, k-half_order+1)->B;
                                 div++;
                             }
                         }
                     }
                 }
-//                printf("[%2ld , %4ld] ",div,sum_R);
-                __array1D(dst->pBuffer, src->width, j, k)->R = sum_R*br_100/(div*100);
-                __array1D(dst->pBuffer, src->width, j, k)->G = sum_G*br_100/(div*100);
-                __array1D(dst->pBuffer, src->width, j, k)->B = sum_B*br_100/(div*100);
+                __array1D(pDstData, src->width, j, k)->R = sum_R*br_100/(div*100);
+                __array1D(pDstData, src->width, j, k)->G = sum_G*br_100/(div*100);
+                __array1D(pDstData, src->width, j, k)->B = sum_B*br_100/(div*100);
             }
             // End of scanning of this row.
         }
         
-//        printf("\n");
         // Remove topmost row because it is old.
         if( j-half_order+1 >= 0 ){         // [!] no cross the broad [0,src->height-1]
             
             if(j%2 == 0){ // Scan Direction:  [old] -->--> [new]. Now it is reaching the rightmost.
                 for(int col=(int)(src->width-half_order);col<src->width;col++){
-                    sum_R -= __array1D(src->pBuffer, src->width, j-half_order+1, col)->R;
-                    sum_G -= __array1D(src->pBuffer, src->width, j-half_order+1, col)->G;
-                    sum_B -= __array1D(src->pBuffer, src->width, j-half_order+1, col)->B;
+                    sum_R -= __array1D(pSrcData, src->width, j-half_order+1, col)->R;
+                    sum_G -= __array1D(pSrcData, src->width, j-half_order+1, col)->G;
+                    sum_B -= __array1D(pSrcData, src->width, j-half_order+1, col)->B;
                     div--;
                 }
             }else{        // Scan Direction:  [new] <--<-- [old]. Now it is reaching the leftmost.
                 for(int col=0;col<half_order;col++){
-                    sum_R -= __array1D(src->pBuffer, src->width, j-half_order+1, col)->R;
-                    sum_G -= __array1D(src->pBuffer, src->width, j-half_order+1, col)->G;
-                    sum_B -= __array1D(src->pBuffer, src->width, j-half_order+1, col)->B;
+                    sum_R -= __array1D(pSrcData, src->width, j-half_order+1, col)->R;
+                    sum_G -= __array1D(pSrcData, src->width, j-half_order+1, col)->G;
+                    sum_B -= __array1D(pSrcData, src->width, j-half_order+1, col)->B;
                     div--;
                 }
             }
@@ -437,25 +440,30 @@ __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
             
             if(j%2 == 0){ // Scan Direction:  [old] -->--> [new]. Now it is reaching the rightmost.
                 for(int col=(int)(src->width-half_order);col<src->width;col++){
-                    sum_R += __array1D(src->pBuffer, src->width, j+half_order, col)->R;
-                    sum_G += __array1D(src->pBuffer, src->width, j+half_order, col)->G;
-                    sum_B += __array1D(src->pBuffer, src->width, j+half_order, col)->B;
+                    sum_R += __array1D(pSrcData, src->width, j+half_order, col)->R;
+                    sum_G += __array1D(pSrcData, src->width, j+half_order, col)->G;
+                    sum_B += __array1D(pSrcData, src->width, j+half_order, col)->B;
                     div++;
                 }
             }else{        // Scan Direction:  [new] <--<-- [old]. Now it is reaching the leftmost.
                 for(int col=0;col<half_order;col++){
-                    sum_R += __array1D(src->pBuffer, src->width, j+half_order, col)->R;
-                    sum_G += __array1D(src->pBuffer, src->width, j+half_order, col)->G;
-                    sum_B += __array1D(src->pBuffer, src->width, j+half_order, col)->B;
+                    sum_R += __array1D(pSrcData, src->width, j+half_order, col)->R;
+                    sum_G += __array1D(pSrcData, src->width, j+half_order, col)->G;
+                    sum_B += __array1D(pSrcData, src->width, j+half_order, col)->B;
                     div++;
                 }
             }
         }
         
     }
-    
-    return NULL;
+    if(src->pBuffer == dst->pBuffer){
+        memcpy(dst->pBuffer,pDstData,src->height*src->width*sizeof(__UNION_PixelRGB888_t));
+        __free(pDstData);
+    }
+    return dst;
 }
+
+
 
 __ImageRGB888_t* __Interpo_NstNeighbor_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB888_t* dst,size_t height,size_t width){
     if(src == NULL || src->pBuffer == NULL || dst == NULL) // Bad address
