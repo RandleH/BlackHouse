@@ -34,6 +34,15 @@ typedef enum{
     kStatus_NotFound   ,
 }E_Status_t;
  
+struct __Region_t{
+    int    xs;
+    int    ys;
+    size_t width;
+    size_t height;
+};
+typedef struct __Region_t __Region_t;
+typedef struct __Region_t __Area_t;
+ 
 #define MAKE_FUNC( class , method )          __##class##_##method  // Function like this: __XXXX_xxxxx();
 #define CALL_FUNC                            MAKE_FUNC             // exactly the same but has semantic difference.
  

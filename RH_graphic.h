@@ -34,10 +34,11 @@ typedef enum{
     kApplyPixel_blur
 }E_ApplyPixel_t;
 
-E_Status_t MAKE_FUNC( Graph , init         ) (void                    );
-E_Status_t MAKE_FUNC( Graph , set_penSize  ) (size_t         penSize  );
-E_Status_t MAKE_FUNC( Graph , set_penColor ) (__GraphPixel_t penColor );
-
+E_Status_t MAKE_FUNC( Graph , init               ) (void                        );
+E_Status_t MAKE_FUNC( Graph , set_penSize        ) (size_t         penSize      );
+E_Status_t MAKE_FUNC( Graph , set_penColor       ) (__GraphPixel_t penColor     );
+E_Status_t MAKE_FUNC( Graph , set_blurSize       ) (size_t         size_0_65535 );
+E_Status_t MAKE_FUNC( Graph , set_blurBrightness ) (size_t         br_100       );
 
 E_Status_t MAKE_FUNC( Graph , circle_raw   ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , circle_edged ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
@@ -47,7 +48,7 @@ E_Status_t MAKE_FUNC( Graph , rect_raw     ) (int xs,int ys,int xe,int ye, __Gra
 E_Status_t MAKE_FUNC( Graph , rect_edged   ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , rect_fill    ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 
-
+E_Status_t MAKE_FUNC( Graph , line_raw     ) (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 
 #ifdef __cplusplus
 }

@@ -30,6 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E3A5F59025EB794A00B917B0 /* RH_dummy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = RH_dummy.c; path = ../RH_dummy.c; sourceTree = "<group>"; };
 		E3CC872A25E92CCA00202EC4 /* Xcode_12 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Xcode_12; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3CC872D25E92CCA00202EC4 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		E3CC873625E92CEE00202EC4 /* RH_graphic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_graphic.c; path = ../RH_graphic.c; sourceTree = "<group>"; };
@@ -90,6 +91,7 @@
 		E3CC873525E92CDA00202EC4 /* BlackHouse */ = {
 			isa = PBXGroup;
 			children = (
+				E3A5F59025EB794A00B917B0 /* RH_dummy.c */,
 				E3CC874F25E93E0000202EC4 /* RH_color.h */,
 				E3CC875025E93E0000202EC4 /* RH_config.h */,
 				E3CC874A25E92D0A00202EC4 /* RH_common.h */,

@@ -31,7 +31,7 @@ struct __GraphConfig_t{
     unsigned int    blur_br_100;
     unsigned int    blur_size;
     __GraphInfo_t   blur_tmp;
-    int blur_xs,blur_ys,blur_xe,blur_ye;
+    __Area_t        blur_area;
 };
     
 static struct __GraphConfig_t GCFG = {
@@ -44,7 +44,7 @@ static struct __GraphConfig_t GCFG = {
 /*===========================================
  > 在指定缓存区,标记一个点
 ============================================*/
-static __GraphPixel_t __ApplyPixel_mark(int x,int y,__GraphPixel_t nan,__GraphInfo_t* pInfo){
+static __GraphPixel_t __ApplyPixel_mark      (int x,int y,__GraphPixel_t nan   ,__GraphInfo_t* pInfo){
     __GraphPixel_t* p = (__GraphPixel_t*)(pInfo->pBuffer);
     size_t width      = pInfo->width;
     size_t height     = pInfo->height;
@@ -58,7 +58,7 @@ static __GraphPixel_t __ApplyPixel_mark(int x,int y,__GraphPixel_t nan,__GraphIn
 /*===========================================
  > 在指定缓存区,去除标记一个点
 ============================================*/
-static __GraphPixel_t __ApplyPixel_unmark(int x,int y,__GraphPixel_t nan,__GraphInfo_t* pInfo){
+static __GraphPixel_t __ApplyPixel_unmark    (int x,int y,__GraphPixel_t nan   ,__GraphInfo_t* pInfo){
     __GraphPixel_t* p = (__GraphPixel_t*)(pInfo->pBuffer);
     size_t width      = pInfo->width;
     size_t height     = pInfo->height;
@@ -72,7 +72,7 @@ static __GraphPixel_t __ApplyPixel_unmark(int x,int y,__GraphPixel_t nan,__Graph
 /*===========================================
  > 在指定缓存区,填充一个像素点,颜色随设定
 ============================================*/
-static __GraphPixel_t __ApplyPixel_fill(int x,int y,__GraphPixel_t color,__GraphInfo_t* pInfo){
+static __GraphPixel_t __ApplyPixel_fill      (int x,int y,__GraphPixel_t color ,__GraphInfo_t* pInfo){
     __GraphPixel_t* p = (__GraphPixel_t*)(pInfo->pBuffer);
     size_t width   = pInfo->width;
     size_t height  = pInfo->height;
@@ -86,7 +86,7 @@ static __GraphPixel_t __ApplyPixel_fill(int x,int y,__GraphPixel_t color,__Graph
 /*===========================================
  > 在指定缓冲区,如果为0,则填充像素
 ============================================*/
-static __GraphPixel_t __ApplyPixel_unzero(int x,int y,__GraphPixel_t color,__GraphInfo_t* pInfo){
+static __GraphPixel_t __ApplyPixel_unzero    (int x,int y,__GraphPixel_t color ,__GraphInfo_t* pInfo){
     __GraphPixel_t* p = (__GraphPixel_t*)(pInfo->pBuffer);
     size_t width   = pInfo->width;
     size_t height  = pInfo->height;
@@ -102,7 +102,7 @@ static __GraphPixel_t __ApplyPixel_unzero(int x,int y,__GraphPixel_t color,__Gra
 /*===========================================
  > 在主屏显存区调节像素的亮度 「耦合」
 ============================================*/
-static __GraphPixel_t __ApplyPixel_lightness(int x,int y,__GraphPixel_t br_100,__GraphInfo_t* pInfo){
+static __GraphPixel_t __ApplyPixel_lightness (int x,int y,__GraphPixel_t br_100,__GraphInfo_t* pInfo){
     __GraphPixel_t* p = (__GraphPixel_t*)(pInfo->pBuffer);
     size_t width   = pInfo->width;
     size_t height  = pInfo->height;
@@ -133,7 +133,7 @@ static __GraphPixel_t __ApplyPixel_lightness(int x,int y,__GraphPixel_t br_100,_
 /*===========================================
  > 在指定缓冲区,取反一个像素颜色
 ============================================*/
-static __GraphPixel_t __ApplyPixel_reverse(int x,int y,__GraphPixel_t br_100,__GraphInfo_t* pInfo){
+static __GraphPixel_t __ApplyPixel_reverse   (int x,int y,__GraphPixel_t br_100,__GraphInfo_t* pInfo){
     __GraphPixel_t* p = (__GraphPixel_t*)(pInfo->pBuffer);
     size_t width      = pInfo->width;
     size_t height     = pInfo->height;
@@ -157,13 +157,13 @@ static __GraphPixel_t __ApplyPixel_reverse(int x,int y,__GraphPixel_t br_100,__G
 }
 
     
-static  __GraphPixel_t __ApplyPixel_cpblur(int x, int y , __GraphPixel_t nan    , __GraphInfo_t* pInfo){
+static  __GraphPixel_t __ApplyPixel_cpblur   (int x,int y,__GraphPixel_t nan   ,__GraphInfo_t* pInfo){
     __GraphPixel_t* p = (__GraphPixel_t*)(pInfo->pBuffer);
     size_t width      = pInfo->width;
     size_t height     = pInfo->height;
     __exitReturn( x>=width || y>=height || x<0 || y<0 , 0);
     
-    *(p+y*width+x) = GCFG.blur_tmp.pBuffer[ GCFG.blur_tmp.width*(y-GCFG.blur_ys)+x-GCFG.blur_xs ].data;
+    *(p+y*width+x) = GCFG.blur_tmp.pBuffer[ GCFG.blur_tmp.width*(y-GCFG.blur_area.ys)+x-GCFG.blur_area.xs ].data;
     return 0;
 }
 
@@ -197,35 +197,43 @@ E_Status_t MAKE_FUNC( Graph , set_penColor ) (__GraphPixel_t penColor){
     GCFG.penColor = penColor;
     return kStatus_Success;
 }
-
-static void MAKE_FUNC( Graph , blur_avg    ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo){
-
-#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
-  #error "Not Support."
-#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
-    GCFG.blur_tmp.pBuffer = __malloc(GCFG.blur_tmp.height*GCFG.blur_tmp.width*sizeof(__UNION_PixelRGB565_t));
-    __Blur_Average_ImgRGB565(&GCFG.blur_tmp, &GCFG.blur_tmp, GCFG.blur_size, GCFG.blur_br_100);
-#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
-    GCFG.blur_tmp.pBuffer = __malloc(GCFG.blur_tmp.height*GCFG.blur_tmp.width*sizeof(__UNION_PixelRGB888_t));
-    for(int y = ys;y <= ye;y++)
-        memcpy( GCFG.blur_tmp.pBuffer+(y-ys)*GCFG.blur_tmp.width ,\
-                pInfo->pBuffer       + y    *pInfo->width + xs   ,\
-                ((xe-xs+1)*sizeof(__UNION_PixelRGB888_t))        );
-    __Blur_Average_ImgRGB888(&GCFG.blur_tmp, &GCFG.blur_tmp, GCFG.blur_size, GCFG.blur_br_100);
     
-#else
-  #error "[RH_graphic]: Unknown color type."
-#endif
-    
+E_Status_t MAKE_FUNC( Graph , set_blurSize ) (size_t size_0_65535){
+    GCFG.blur_size = __limit((unsigned int)(size_0_65535), 0U, 65535U);
+    return kStatus_Success;
 }
+    
+E_Status_t MAKE_FUNC( Graph , set_blurBrightness ) (size_t br_100){
+    GCFG.blur_br_100 = __limit((unsigned int)(br_100), 0, 200);
+    return kStatus_Success;
+}
+
 
 /*===========================================
  > 插入一个空心圆,线宽为1
 ============================================*/
-E_Status_t MAKE_FUNC( Graph , circle_raw )  (int x ,int y ,int d ,         __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+E_Status_t MAKE_FUNC( Graph , circle_raw   )  (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method){
     int r    = d>>1;
     int p    = 3-2*r;
     bool eps = (d%2==0);
+    
+    if( method == kApplyPixel_blur ){
+        GCFG.blur_area.xs                            = __limit( (signed)(x-(d>>1)-1) , 0 , (int)(pInfo->width ));
+        GCFG.blur_area.ys                            = __limit( (signed)(y-(d>>1)-1) , 0 , (int)(pInfo->height));
+        GCFG.blur_area.width  = GCFG.blur_tmp.width  = __limit( (signed)(x+(d>>1)-1) , 0 , (int)(pInfo->width )) - GCFG.blur_area.xs +1;
+        GCFG.blur_area.height = GCFG.blur_tmp.height = __limit( (signed)(y+(d>>1)+1) , 0 , (int)(pInfo->height)) - GCFG.blur_area.ys +1;
+        GCFG.blur_tmp.pBuffer = __malloc( GCFG.blur_area.width*GCFG.blur_area.height*sizeof(__GraphPixel_t) );
+#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+        while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
+        while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
+        __Blur_Average_ImgRGB888(pInfo, &GCFG.blur_tmp, &GCFG.blur_area, GCFG.blur_size, GCFG.blur_br_100);
+#else
+  #error "[RH_graphic]: Unknown color type."
+#endif
+    }
+    
     for(int x_tmp=0,y_tmp = r;x_tmp<=y_tmp;x_tmp++){
             ( *applyPixelMethod [method] )(x     + x_tmp ,y     + y_tmp ,GCFG.penColor,pInfo );
             ( *applyPixelMethod [method] )(x+eps - x_tmp ,y     + y_tmp ,GCFG.penColor,pInfo );
@@ -243,26 +251,43 @@ E_Status_t MAKE_FUNC( Graph , circle_raw )  (int x ,int y ,int d ,         __Gra
             y_tmp--;
         }
     }
+    
+    if( method == kApplyPixel_blur ){
+        __free(GCFG.blur_tmp.pBuffer);
+        GCFG.blur_area.xs     = 0;
+        GCFG.blur_area.ys     = 0;
+        GCFG.blur_area.width  = GCFG.blur_tmp.width  = 0;
+        GCFG.blur_area.height = GCFG.blur_tmp.height = 0;
+        GCFG.blur_tmp.pBuffer = NULL;
+    }
+    
     return kStatus_Success;
 }
 
 /*====================================
  > 插入一个填充圆
 =====================================*/
-E_Status_t MAKE_FUNC( Graph , circle_fill )  (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+E_Status_t MAKE_FUNC( Graph , circle_fill  )  (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method){
     int r = d>>1;
     int p = 3-(r<<1);
     int x_tmp = 0,y_tmp = r;
     bool eps  = (d%2==0);
     
     if( method == kApplyPixel_blur ){
-        GCFG.blur_xs = __limit( (signed)(x-(d>>1)+1) , 0 , (int)(pInfo->width ) );
-        GCFG.blur_xe = __limit( (signed)(x+(d>>1)+1) , 0 , (int)(pInfo->width ) );
-        GCFG.blur_ys = __limit( (signed)(y-(d>>1)+1) , 0 , (int)(pInfo->height) );
-        GCFG.blur_ye = __limit( (signed)(y+(d>>1)+1) , 0 , (int)(pInfo->height) );
-        GCFG.blur_tmp.width  = GCFG.blur_xe - GCFG.blur_xs +1;
-        GCFG.blur_tmp.height = GCFG.blur_ye - GCFG.blur_ys +1;
-        MAKE_FUNC( Graph , blur_avg    )(GCFG.blur_xs,GCFG.blur_ys,GCFG.blur_xe,GCFG.blur_ye,pInfo);
+        GCFG.blur_area.xs                            = __limit( (signed)(x-(d>>1)-1) , 0 , (int)(pInfo->width ));
+        GCFG.blur_area.ys                            = __limit( (signed)(y-(d>>1)-1) , 0 , (int)(pInfo->height));
+        GCFG.blur_area.width  = GCFG.blur_tmp.width  = __limit( (signed)(x+(d>>1)-1) , 0 , (int)(pInfo->width )) - GCFG.blur_area.xs +1;
+        GCFG.blur_area.height = GCFG.blur_tmp.height = __limit( (signed)(y+(d>>1)+1) , 0 , (int)(pInfo->height)) - GCFG.blur_area.ys +1;
+        GCFG.blur_tmp.pBuffer = __malloc( GCFG.blur_area.width*GCFG.blur_area.height*sizeof(__GraphPixel_t) );
+#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+        while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
+        while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
+        __Blur_Average_ImgRGB888(pInfo, &GCFG.blur_tmp, &GCFG.blur_area, GCFG.blur_size, GCFG.blur_br_100);
+#else
+  #error "[RH_graphic]: Unknown color type."
+#endif
     }
     
     for(;x_tmp<=y_tmp;x_tmp++){
@@ -292,10 +317,10 @@ E_Status_t MAKE_FUNC( Graph , circle_fill )  (int x ,int y ,int d ,        __Gra
     
     if( method == kApplyPixel_blur ){
         __free(GCFG.blur_tmp.pBuffer);
-        GCFG.blur_xs = 0;
-        GCFG.blur_ys = 0;
-        GCFG.blur_xe = 0;
-        GCFG.blur_ye = 0;
+        GCFG.blur_area.xs     = 0;
+        GCFG.blur_area.ys     = 0;
+        GCFG.blur_area.width  = GCFG.blur_tmp.width  = 0;
+        GCFG.blur_area.height = GCFG.blur_tmp.height = 0;
         GCFG.blur_tmp.pBuffer = NULL;
     }
     return kStatus_Success;
@@ -304,7 +329,7 @@ E_Status_t MAKE_FUNC( Graph , circle_fill )  (int x ,int y ,int d ,        __Gra
 /*====================================
  > 插入一个空心圆,线宽随设定
 =====================================*/
-E_Status_t MAKE_FUNC( Graph , circle_edged ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+E_Status_t MAKE_FUNC( Graph , circle_edged )  (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method){
     int r = d>>1;
     int r_ex  = r;
     int r_in  = (int)(r-GCFG.penSize);
@@ -317,6 +342,23 @@ E_Status_t MAKE_FUNC( Graph , circle_edged ) (int x ,int y ,int d ,        __Gra
     int p_in  = 3-2*r_in;
     
     bool eps  = (d%2==0);
+    
+    if( method == kApplyPixel_blur ){
+        GCFG.blur_area.xs                            = __limit( (signed)(x-(d>>1)-1) , 0 , (int)(pInfo->width ));
+        GCFG.blur_area.ys                            = __limit( (signed)(y-(d>>1)-1) , 0 , (int)(pInfo->height));
+        GCFG.blur_area.width  = GCFG.blur_tmp.width  = __limit( (signed)(x+(d>>1)-1) , 0 , (int)(pInfo->width )) - GCFG.blur_area.xs +1;
+        GCFG.blur_area.height = GCFG.blur_tmp.height = __limit( (signed)(y+(d>>1)+1) , 0 , (int)(pInfo->height)) - GCFG.blur_area.ys +1;
+        GCFG.blur_tmp.pBuffer = __malloc( GCFG.blur_area.width*GCFG.blur_area.height*sizeof(__GraphPixel_t) );
+#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+        while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
+        while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
+        __Blur_Average_ImgRGB888(pInfo, &GCFG.blur_tmp, &GCFG.blur_area, GCFG.blur_size, GCFG.blur_br_100);
+#else
+  #error "[RH_graphic]: Unknown color type."
+#endif
+    }
     
     for(;x_ex_tmp<y_ex_tmp;x_ex_tmp++,x_in_tmp++){
         for(int Y = y_in_tmp;Y<y_ex_tmp;Y++){
@@ -343,13 +385,25 @@ E_Status_t MAKE_FUNC( Graph , circle_edged ) (int x ,int y ,int d ,        __Gra
             y_in_tmp--;
         }
     }
+    
+    if( method == kApplyPixel_blur ){
+        __free(GCFG.blur_tmp.pBuffer);
+        GCFG.blur_area.xs     = 0;
+        GCFG.blur_area.ys     = 0;
+        GCFG.blur_area.width  = GCFG.blur_tmp.width  = 0;
+        GCFG.blur_area.height = GCFG.blur_tmp.height = 0;
+        GCFG.blur_tmp.pBuffer = NULL;
+    }
     return kStatus_Success;
 }
 
 /*====================================
  > 插入一个空心长发形,线宽为1
 =====================================*/
-E_Status_t MAKE_FUNC( Graph , rect_raw )     (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+E_Status_t MAKE_FUNC( Graph , rect_raw     )  (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+    if( method == kApplyPixel_blur ){
+        while(1);
+    }
     for(int x=xs;x<=xe;x++){
         ( *applyPixelMethod [method] )(x,ys,GCFG.penColor,pInfo);
         ( *applyPixelMethod [method] )(x,ye,GCFG.penColor,pInfo);
@@ -358,13 +412,17 @@ E_Status_t MAKE_FUNC( Graph , rect_raw )     (int xs,int ys,int xe,int ye, __Gra
         ( *applyPixelMethod [method] )(xs,y,GCFG.penColor,pInfo);
         ( *applyPixelMethod [method] )(xe,y,GCFG.penColor,pInfo);
     }
+    
+    if( method == kApplyPixel_blur ){
+        while(1);
+    }
     return kStatus_Success;
 }
 
 /*====================================
  > 插入一个填充长发形
 =====================================*/
-E_Status_t MAKE_FUNC( Graph , rect_fill )    (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+E_Status_t MAKE_FUNC( Graph , rect_fill    )  (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
     
     switch(method){
         case kApplyPixel_fill:
@@ -379,17 +437,30 @@ E_Status_t MAKE_FUNC( Graph , rect_fill )    (int xs,int ys,int xe,int ye, __Gra
             break;
         case kApplyPixel_blur:
         {
-            GCFG.blur_tmp.height  = ye-ys+1;
-            GCFG.blur_tmp.width   = xe-xs+1;
+            GCFG.blur_area.xs                            = __limit( (signed)(xs) , 0 , (int)(pInfo->width ));
+            GCFG.blur_area.ys                            = __limit( (signed)(ys) , 0 , (int)(pInfo->height));
+            GCFG.blur_area.width  = GCFG.blur_tmp.width  = __limit( (signed)(xe) , 0 , (int)(pInfo->width )) - GCFG.blur_area.xs +1;
+            GCFG.blur_area.height = GCFG.blur_tmp.height = __limit( (signed)(ye) , 0 , (int)(pInfo->height)) - GCFG.blur_area.ys +1;
+            GCFG.blur_tmp.pBuffer = __malloc( GCFG.blur_area.width*GCFG.blur_area.height*sizeof(__GraphPixel_t) );
+#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+            while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
+            while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
+            __Blur_Average_ImgRGB888(pInfo, &GCFG.blur_tmp, &GCFG.blur_area, GCFG.blur_size, GCFG.blur_br_100);
+#else
+  #error "[RH_graphic]: Unknown color type."
+#endif
             
-            MAKE_FUNC( Graph , blur_avg    )(xs,ys,xe,ye,pInfo);
-            //...blur_tmp -> pInfo...//
+
             for(int y = ys;y <= ye;y++)
                 memcpy( pInfo->pBuffer       + y    *pInfo->width  + xs  ,\
                         GCFG.blur_tmp.pBuffer+(y-ys)*GCFG.blur_tmp.width ,\
                         ((xe-xs+1)*sizeof(pInfo->pBuffer[0]))        );
-            GCFG.blur_tmp.height  = 0;
-            GCFG.blur_tmp.width   = 0;
+            GCFG.blur_area.xs     = 0;
+            GCFG.blur_area.ys     = 0;
+            GCFG.blur_tmp.height  = GCFG.blur_area.height = 0;
+            GCFG.blur_tmp.width   = GCFG.blur_area.width  = 0;
             __free(GCFG.blur_tmp.pBuffer);
             GCFG.blur_tmp.pBuffer = NULL;
         }
@@ -405,8 +476,26 @@ E_Status_t MAKE_FUNC( Graph , rect_fill )    (int xs,int ys,int xe,int ye, __Gra
 /*====================================
  > 插入一个空心长发形,线宽随设定
 =====================================*/
-E_Status_t MAKE_FUNC( Graph , rect_edged )   (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+E_Status_t MAKE_FUNC( Graph , rect_edged   )  (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
     int loop = 0;
+    if(method == kApplyPixel_blur){
+        GCFG.blur_area.xs                            = __limit( (signed)(xs) , 0 , (int)(pInfo->width ));
+        GCFG.blur_area.ys                            = __limit( (signed)(ys) , 0 , (int)(pInfo->height));
+        GCFG.blur_area.width  = GCFG.blur_tmp.width  = __limit( (signed)(xe) , 0 , (int)(pInfo->width )) - GCFG.blur_area.xs +1;
+        GCFG.blur_area.height = GCFG.blur_tmp.height = __limit( (signed)(ye) , 0 , (int)(pInfo->height)) - GCFG.blur_area.ys +1;
+        GCFG.blur_tmp.pBuffer = __malloc( GCFG.blur_area.width*GCFG.blur_area.height*sizeof(__GraphPixel_t) );
+#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+            while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
+            while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
+            __Blur_Average_ImgRGB888(pInfo, &GCFG.blur_tmp, &GCFG.blur_area, GCFG.blur_size, GCFG.blur_br_100);
+#else
+  #error "[RH_graphic]: Unknown color type."
+#endif
+        
+    }
+    
     while(loop < GCFG.penSize){
         int x = xs+loop, y = ys+loop;
 
@@ -424,7 +513,68 @@ E_Status_t MAKE_FUNC( Graph , rect_edged )   (int xs,int ys,int xe,int ye, __Gra
         }
         loop++;
     }
+    if(method == kApplyPixel_blur){
+        GCFG.blur_area.xs     = 0;
+        GCFG.blur_area.ys     = 0;
+        GCFG.blur_tmp.height  = GCFG.blur_area.height = 0;
+        GCFG.blur_tmp.width   = GCFG.blur_area.width  = 0;
+        __free(GCFG.blur_tmp.pBuffer);
+        GCFG.blur_tmp.pBuffer = NULL;
+    }
     return kStatus_Success;
+}
+    
+/*====================================
+ > 插入直线，线宽为1
+=====================================*/
+E_Status_t MAKE_FUNC( Graph , line_raw     )  (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+    int x_min = (int)(__min(x1,x2));
+    int x_max = (int)(__max(x1,x2));
+    int y_min = (int)(__min(y1,y2));
+    int y_max = (int)(__max(y1,y2));
+    int delta_x    = (int)( x_max - x_min );
+    int delta_y    = (int)( y_max - y_min );
+    
+    int type = (int)(( ((y2-y1)*(x2-x1)<0) << 1 ) | (delta_y > delta_x));
+
+    if(delta_y > delta_x){
+        int temp = delta_x;
+        delta_x = delta_y;
+        delta_y = temp;
+    }
+    
+    int j = 0;
+    int e = 0;
+    
+    if(method == kApplyPixel_blur){
+        while(1);
+    }
+    
+    ( *applyPixelMethod [method] )(x1,y1,GCFG.penColor,pInfo);
+    ( *applyPixelMethod [method] )(x2,y2,GCFG.penColor,pInfo);
+    for(int i = 0;i < delta_x;i++){
+        switch(type){
+            case 0:( *applyPixelMethod [method] )(x_min+i,y_min+j,GCFG.penColor,pInfo);break;
+            case 1:( *applyPixelMethod [method] )(x_min+j,y_min+i,GCFG.penColor,pInfo);break;
+            case 2:( *applyPixelMethod [method] )(x_min+i,y_max-j,GCFG.penColor,pInfo);break;
+            case 3:( *applyPixelMethod [method] )(x_min+j,y_max-i,GCFG.penColor,pInfo);break;
+        }
+        e += delta_y;
+        if( 2*( e + delta_y ) > delta_x){
+            j++;
+            e -= delta_x;
+        }
+    }
+    
+    if(method == kApplyPixel_blur){
+        while(1);
+    }
+    return kStatus_Success;
+}
+   
+    
+E_Status_t MAKE_FUNC( Graph , line_edged   )  (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method){
+    return kStatus_Denied;
 }
     
 #ifdef __cplusplus

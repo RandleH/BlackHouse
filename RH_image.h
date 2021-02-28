@@ -79,7 +79,7 @@ __ImageRGB888_t* __Filter_OTUS_ImgRGB888         (const __ImageRGB888_t* src,__I
 __ImageRGB888_t* __Trans_Mirror_ImgRGB888        (const __ImageRGB888_t* src,__ImageRGB888_t* dst,uint8_t HV);
 
 __ImageRGB888_t* __Blur_Gussian_ImgRGB888        (const __ImageRGB888_t* src,__ImageRGB888_t* dst,uint32_t radSize, uint16_t br_100);
-__ImageRGB888_t* __Blur_Average_ImgRGB888        (const __ImageRGB888_t* src,__ImageRGB888_t* dst,uint32_t radSize, uint16_t br_100);
+__ImageRGB888_t* __Blur_Average_ImgRGB888        (const __ImageRGB888_t* src,__ImageRGB888_t* dst,__Area_t* area,uint32_t radSize, uint16_t br_100);
 
 __ImageRGB888_t* __Interpo_NstNeighbor_ImgRGB888 (const __ImageRGB888_t* src,__ImageRGB888_t* dst,size_t height,size_t width); //
 

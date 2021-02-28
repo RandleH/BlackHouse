@@ -20,10 +20,22 @@ int main(int argc, const char * argv[]) {
     __GraphInfo_t BufferInfo = {    .pBuffer = Screen_buffer[0],
                                     .height  = 480  ,
                                     .width   = 800 };
+    
+    __Graph_set_penColor(M_COLOR_SILVER);
+    __Graph_rect_fill(0, 0, 799, 479, &BufferInfo, kApplyPixel_fill);
+    __Graph_set_penColor(M_COLOR_PINK);
+    
+    __Graph_set_penSize(18);
+    __Graph_rect_edged(370, 0, 430, 479, &BufferInfo, kApplyPixel_blur);
+    
+    
+    __Graph_circle_edged(400, 240, 101, &BufferInfo, kApplyPixel_blur);
+    
+    __Graph_line_raw(40,40, 340, 90, &BufferInfo, kApplyPixel_fill);
+    
 
-    __Graph_circle_fill(200, 200, 101, &BufferInfo, kApplyPixel_fill);
 
-    __OutBMP_ImgRGB888("/Users/randle_h/desktop/lenna.bmp",&BufferInfo);
+    __OutBMP_ImgRGB888("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
     
     return 0;
 }
