@@ -32,6 +32,7 @@ typedef enum{
     kStatus_NoSpace    ,
     kStatus_ErrorID    ,
     kStatus_NotFound   ,
+    kStatus_Warning    ,
 }E_Status_t;
  
 struct __Region_t{

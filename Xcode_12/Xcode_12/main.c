@@ -31,9 +31,11 @@ int main(int argc, const char * argv[]) {
     
     __Graph_circle_edged(400, 240, 101, &BufferInfo, kApplyPixel_blur);
     
-    __Graph_line_raw(40,40, 340, 90, &BufferInfo, kApplyPixel_fill);
+    __Graph_line_edged(40,40, 340, 90, &BufferInfo, kApplyPixel_fill);
     
-
+    __Graph_line_edged(300,40, 500, 40, &BufferInfo, kApplyPixel_fill);
+    __Graph_line_edged(40,300, 40, 400, &BufferInfo, kApplyPixel_fill);
+//    __Graph_quad_fill(90, 90, 80, 300, 300, 70, 500, 400, &BufferInfo, kApplyPixel_fill);
 
     __OutBMP_ImgRGB888("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
     

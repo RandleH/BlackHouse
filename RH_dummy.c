@@ -57,6 +57,10 @@ __ImageRGB888_t* IMG_OUT = __Create_ImgRGB888(AREA.width, AREA.height);
 __Blur_Average_ImgRGB888(IMG_IN,IMG_OUT,&AREA,40000,100);
 __OutBMP_ImgRGB888(des, IMG_OUT);
 
+
+
+( *applyPixelMethod [method] )(x1,y1,GCFG.penColor,pInfo);
+
 #endif
 
 
