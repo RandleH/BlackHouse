@@ -390,8 +390,6 @@ __ImageRGB888_t* __Blur_Average_ImgRGB888(const __ImageRGB888_t* src,__ImageRGB8
                     }
                     
                 }
-                if(i==320&&j==220)
-                    printf("[%ld,%ld,%ld] div = %ld\n ",sum_R,sum_G,sum_B,div);
                 __array1D(pDstData, area->width, j-area->ys, i-area->xs)->R = sum_R*br_100/(div*100);
                 __array1D(pDstData, area->width, j-area->ys, i-area->xs)->G = sum_G*br_100/(div*100);
                 __array1D(pDstData, area->width, j-area->ys, i-area->xs)->B = sum_B*br_100/(div*100);

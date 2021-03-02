@@ -228,7 +228,6 @@ E_Status_t MAKE_FUNC( LINK_Loop , printAllNodesAdr      )  (__LinkLoopNode *cons
 }
       
     
-    
 E_Status_t MAKE_FUNC( LINK_BiTree , createNode          )  (__LinkBiTreeNode **  ptr ){
     __exitReturn(ptr==NULL, kStatus_BadAccess );
     
@@ -371,6 +370,101 @@ E_Status_t MAKE_FUNC( LINK_BiTree , findNode            )  (__LinkBiTreeNode ** 
     }
     
     return state;
+}
+    
+    
+E_Status_t MAKE_FUNC( Stack , createBase ) ( __Stack_t ** ptr  ){
+    __exitReturn( !ptr   , kStatus_BadAccess );
+    *ptr = (__Stack_t*)__malloc(sizeof(__Stack_t));
+    __exitReturn( !(*ptr), kStatus_NoSpace   );
+    __SET_STRUCT_MB(__Stack_t,__Stack_t*,*ptr,pPrev  ,*ptr);
+    __SET_STRUCT_MB(__Stack_t,__Stack_t*,*ptr,pNext  ,*ptr);
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( Stack , push       ) ( __Stack_t ** ppBase , void* pObject){
+    __exitReturn( !ppBase   , kStatus_BadAccess );
+    __exitReturn( !*ppBase  , kStatus_BadAccess );
+    __exitReturn( !pObject  , kStatus_BadAccess );
+    __Stack_t* pNew = (__Stack_t*)__malloc(sizeof(__Stack_t));
+    __exitReturn( !pNew     , kStatus_NoSpace   );
+    
+    __SET_STRUCT_MB(__Stack_t, void*     , pNew            , object, pObject          );
+    __SET_STRUCT_MB(__Stack_t, __Stack_t*, pNew            , pPrev , (*ppBase)->pPrev );
+    __SET_STRUCT_MB(__Stack_t, __Stack_t*, pNew            , pNext , (*ppBase)        );
+    
+    __SET_STRUCT_MB(__Stack_t, __Stack_t*, (*ppBase)->pPrev, pNext , pNew             );
+    __SET_STRUCT_MB(__Stack_t, __Stack_t*, (*ppBase)       , pPrev , pNew             );
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( Stack , pop        ) ( __Stack_t ** ppBase , void     ** pObject){
+    __exitReturn( !ppBase   , kStatus_BadAccess );
+    __exitReturn( !*ppBase  , kStatus_BadAccess );
+    __exitReturn( !pObject  , kStatus_BadAccess );
+    __exitReturn((*ppBase)->pNext==(*ppBase)->pPrev && (*ppBase)->pNext==(*ppBase) , kStatus_Empty );
+    
+    *pObject = (void*)((*ppBase)->pPrev->object);
+    __free((__Stack_t*)((*ppBase)->pPrev));
+    
+    __SET_STRUCT_MB(__Stack_t, __Stack_t*, (*ppBase)->pPrev->pPrev , pNext, (*ppBase)             );
+    __SET_STRUCT_MB(__Stack_t, __Stack_t*, (*ppBase)               , pPrev, (*ppBase)->pPrev->pPrev );
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( Stack , size       ) ( __Stack_t ** ppBase  , size_t    *  result){
+    __exitReturn( !ppBase   , kStatus_BadAccess );
+    __exitReturn( !*ppBase  , kStatus_BadAccess );
+    __exitReturn( !result   , kStatus_BadAccess );
+    __Stack_t *p = *ppBase;
+    *result      = 0;
+    while(p->pNext!=*ppBase){
+        (*result)++;
+        p = (__Stack_t*)(p->pNext);
+    }
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( Stack , top        ) ( __Stack_t ** ppBase  , void     **  ppObj ){
+    __exitReturn( !ppBase   , kStatus_BadAccess );
+    __exitReturn( !*ppBase  , kStatus_BadAccess );
+    __exitReturn( !ppObj    , kStatus_BadAccess );
+    
+    *ppObj = (void*)((*ppBase)->pPrev->object);
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( Stack , empty      ) ( __Stack_t ** ppBase ){
+    __exitReturn( !ppBase   , kStatus_BadAccess );
+    __exitReturn( !*ppBase  , kStatus_BadAccess );
+    
+    
+    if( (*ppBase)->pNext==(*ppBase)->pPrev && (*ppBase)->pNext==(*ppBase) ){
+        return kStatus_Empty;
+    }
+    
+    return kStatus_Success;
+}
+    
+E_Status_t MAKE_FUNC( Stack , deleteBase ) ( __Stack_t ** ptr    ){
+    __exitReturn( !ptr   , kStatus_BadAccess );
+    __exitReturn( !*ptr  , kStatus_BadAccess );
+    __Stack_t *p = *ptr;
+    if(p->pNext==*ptr){
+        __free((void*)(p));
+    }else{
+        while(p->pNext!=*ptr){
+            p = (__Stack_t*)(p->pNext);
+            __free((void*)(p->pPrev));
+            __SET_STRUCT_MB( __Stack_t, __Stack_t*, p, pPrev , NULL );
+        }
+    }
+    *ptr = NULL;
+    return kStatus_Success;
 }
     
 #ifdef __cplusplus

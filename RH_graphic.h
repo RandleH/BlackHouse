@@ -44,10 +44,16 @@ E_Status_t MAKE_FUNC( Graph , set_blurBrightness ) (size_t         br_100       
 E_Status_t MAKE_FUNC( Graph , circle_raw   ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , circle_edged ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , circle_fill  ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+E_Status_t MAKE_FUNC( Graph , circle_qrt1  ) (int x ,int y ,int r ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+E_Status_t MAKE_FUNC( Graph , circle_qrt2  ) (int x ,int y ,int r ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+E_Status_t MAKE_FUNC( Graph , circle_qrt3  ) (int x ,int y ,int r ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+E_Status_t MAKE_FUNC( Graph , circle_qrt4  ) (int x ,int y ,int r ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+
 
 E_Status_t MAKE_FUNC( Graph , rect_raw     ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , rect_edged   ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , rect_fill    ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+E_Status_t MAKE_FUNC( Graph , rect_round   ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 
 E_Status_t MAKE_FUNC( Graph , line_raw     ) (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , line_edged   ) (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
@@ -55,6 +61,8 @@ E_Status_t MAKE_FUNC( Graph , line_fill    ) (int x1,int y1,int x2,int y2, __Gra
 
 E_Status_t MAKE_FUNC( Graph , quad_raw     ) (int x1,int y1,int x2,int y2,int x3,int y3,int x4,int y4, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , quad_fill    ) (int x1,int y1,int x2,int y2,int x3,int y3,int x4,int y4, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+
+
 
 #ifdef __cplusplus
 }

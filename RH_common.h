@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <wchar.h>
 #include <setjmp.h>
 #include <signal.h>
@@ -33,6 +34,7 @@ typedef enum{
     kStatus_ErrorID    ,
     kStatus_NotFound   ,
     kStatus_Warning    ,
+    kStatus_Empty      
 }E_Status_t;
  
 struct __Region_t{
