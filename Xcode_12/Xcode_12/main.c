@@ -37,7 +37,7 @@ int main(int argc, const char * argv[]) {
     __Graph_line_edged(40,300, 40, 400, &BufferInfo, kApplyPixel_fill);
 //    __Graph_quad_fill(90, 90, 80, 300, 300, 70, 500, 400, &BufferInfo, kApplyPixel_fill);
 
-    __OutBMP_ImgRGB888("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
+    __ImgRGB888_out_bmp("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
     
     return 0;
 }
