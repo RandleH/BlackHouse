@@ -63,6 +63,19 @@ E_Status_t MAKE_FUNC( Stack , empty      ) ( __Stack_t ** ppBase );
 E_Status_t MAKE_FUNC( Stack , top        ) ( __Stack_t ** ppBase  , void     **  ppObj );
 E_Status_t MAKE_FUNC( Stack , deleteBase ) ( __Stack_t ** ptr    );//
 
+
+
+struct __Queue_t{
+    const void*             const object;
+    const struct __Queue_t* const pNext ;
+};
+typedef struct __Queue_t __Queue_t;
+
+E_Status_t MAKE_FUNC( Queue , createHead ) ( __Queue_t ** ptr    );
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

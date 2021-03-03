@@ -8,7 +8,7 @@ extern "C" {
 /*=====================================================================
  > Data Structure Reference
 ======================================================================*/
-E_Status_t MAKE_FUNC( LINK_Loop , createNode            )  (__LinkLoopNode **      ptr ){
+E_Status_t __LINK_Loop_createNode              (__LinkLoopNode **      ptr ){
     __exitReturn(ptr == NULL  , kStatus_BadAccess );
 
     *ptr =  (__LinkLoopNode*)__malloc(sizeof(__LinkLoopNode));
@@ -19,8 +19,8 @@ E_Status_t MAKE_FUNC( LINK_Loop , createNode            )  (__LinkLoopNode **   
     return kStatus_Success;
 }
       
-E_Status_t MAKE_FUNC( LINK_Loop , createHeadNode        )  (__LinkLoopNode **      ptr ){
-    E_Status_t state = MAKE_FUNC( LINK_Loop , createNode)(ptr);
+E_Status_t __LINK_Loop_createHeadNode          (__LinkLoopNode **      ptr ){
+    E_Status_t state = __LINK_Loop_createNode(ptr);
     __exitReturn(state!=kStatus_Success, state);
 
     __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,*ptr,pNext  ,*ptr);
@@ -29,7 +29,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , createHeadNode        )  (__LinkLoopNode **   
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_tail          )  (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppNewNode){
+E_Status_t __LINK_Loop_addNode_tail            (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppNewNode){
   __exitReturn(  ppHeadNode == NULL ||  ppNewNode == NULL , kStatus_BadAccess);
   __exitReturn( *ppHeadNode == NULL || *ppNewNode == NULL , kStatus_BadAccess);
   
@@ -61,9 +61,9 @@ E_Status_t MAKE_FUNC( LINK_Loop , addNode_tail          )  (__LinkLoopNode *cons
   return kStatus_Success;
 }
       
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_tail_newhead  )  (__LinkLoopNode **      ppHeadNode ,__LinkLoopNode *const* ppNewNode){
+E_Status_t __LINK_Loop_addNode_tail_newhead    (__LinkLoopNode **      ppHeadNode ,__LinkLoopNode *const* ppNewNode){
   
-    E_Status_t state = MAKE_FUNC( LINK_Loop , addNode_tail   )(ppHeadNode, ppNewNode);
+    E_Status_t state = __LINK_Loop_addNode_tail   (ppHeadNode, ppNewNode);
     __exitReturn(state != kStatus_Success, state);
     
     // New Head
@@ -72,7 +72,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , addNode_tail_newhead  )  (__LinkLoopNode **   
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_front         )  (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppNewNode){
+E_Status_t __LINK_Loop_addNode_front           (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppNewNode){
     __exitReturn(  ppHeadNode == NULL ||  ppNewNode == NULL , kStatus_BadAccess);
     __exitReturn( *ppHeadNode == NULL || *ppNewNode == NULL , kStatus_BadAccess);
     
@@ -104,7 +104,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , addNode_front         )  (__LinkLoopNode *cons
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_front_newhead )  (__LinkLoopNode **      ppHeadNode ,__LinkLoopNode *const* ppNewNode){
+E_Status_t __LINK_Loop_addNode_front_newhead   (__LinkLoopNode **      ppHeadNode ,__LinkLoopNode *const* ppNewNode){
     E_Status_t state = MAKE_FUNC(LINK_Loop , addNode_front)(ppHeadNode, ppNewNode);
     __exitReturn(state!=kStatus_Success, state);
     
@@ -114,7 +114,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , addNode_front_newhead )  (__LinkLoopNode **   
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , findNode              )  (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppTarget ){
+E_Status_t __LINK_Loop_findNode                (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppTarget ){
     __exitReturn(  ppHeadNode == NULL ||  ppTarget == NULL , kStatus_BadAccess);
     const __LinkLoopNode* pHeadNode = *ppHeadNode;
     const __LinkLoopNode* pTarget   = *ppTarget;
@@ -132,7 +132,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , findNode              )  (__LinkLoopNode *cons
     return kStatus_NotFound;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , checkLoopNode         )  (__LinkLoopNode *const* ppHeadNode){
+E_Status_t __LINK_Loop_checkLoopNode           (__LinkLoopNode *const* ppHeadNode){
     __exitReturn(ppHeadNode == NULL , kStatus_BadAccess);
     __LinkLoopNode* pHeadNode = *ppHeadNode;
     __exitReturn(pHeadNode == NULL  , kStatus_BadAccess);
@@ -150,7 +150,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , checkLoopNode         )  (__LinkLoopNode *cons
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , deleteNode            )  (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode **      ppTarget ){
+E_Status_t __LINK_Loop_deleteNode              (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode **      ppTarget ){
     E_Status_t state = MAKE_FUNC(LINK_Loop , removeNode)(ppHeadNode, ppTarget);
     __exitReturn(state!=kStatus_Success , state             );
     
@@ -160,7 +160,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , deleteNode            )  (__LinkLoopNode *cons
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , removeNode            )  (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppTarget ){
+E_Status_t __LINK_Loop_removeNode              (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppTarget ){
     __exitReturn( ppHeadNode==NULL || ppTarget==NULL,kStatus_BadAccess );
     __LinkLoopNode* pHeadNode = *ppHeadNode;
     __LinkLoopNode* pTarget   = *ppTarget;
@@ -184,7 +184,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , removeNode            )  (__LinkLoopNode *cons
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , removeAllNodes        )  (__LinkLoopNode *const* ppHeadNode){
+E_Status_t __LINK_Loop_removeAllNodes          (__LinkLoopNode *const* ppHeadNode){
     __exitReturn(ppHeadNode==NULL, kStatus_BadAccess);
     
     E_Status_t state = MAKE_FUNC(LINK_Loop,checkLoopNode)(ppHeadNode);
@@ -211,7 +211,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , removeAllNodes        )  (__LinkLoopNode *cons
     return kStatus_Success;
 }
 
-E_Status_t MAKE_FUNC( LINK_Loop , printAllNodesAdr      )  (__LinkLoopNode *const* ppHeadNode,int(*PRINTF_FUNC)(const char*,...)){
+E_Status_t __LINK_Loop_printAllNodesAdr        (__LinkLoopNode *const* ppHeadNode,int(*PRINTF_FUNC)(const char*,...)){
   
     __exitReturn(ppHeadNode == NULL, kStatus_BadAccess);
     
@@ -228,7 +228,7 @@ E_Status_t MAKE_FUNC( LINK_Loop , printAllNodesAdr      )  (__LinkLoopNode *cons
 }
       
     
-E_Status_t MAKE_FUNC( LINK_BiTree , createNode          )  (__LinkBiTreeNode **  ptr ){
+E_Status_t __LINK_BiTree_createNode            (__LinkBiTreeNode **  ptr ){
     __exitReturn(ptr==NULL, kStatus_BadAccess );
     
     *ptr = (__LinkBiTreeNode*)__malloc(sizeof(__LinkBiTreeNode));
@@ -239,14 +239,14 @@ E_Status_t MAKE_FUNC( LINK_BiTree , createNode          )  (__LinkBiTreeNode ** 
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( LINK_BiTree , createHeadNode      )  (__LinkBiTreeNode **  ptr ){
+E_Status_t __LINK_BiTree_createHeadNode        (__LinkBiTreeNode **  ptr ){
     E_Status_t state = MAKE_FUNC(LINK_BiTree, createNode)(ptr);
     __exitReturn(state!=kStatus_Success,state);
     __SET_STRUCT_MB(__LinkBiTreeNode,__LinkBiTreeNode*,*ptr,pPrev  ,NULL);
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2r         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+E_Status_t __LINK_BiTree_addNode_l2r           (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
     __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
     __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
     
@@ -254,11 +254,11 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2r         )  (__LinkBiTreeNode ** 
     __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
     
     // Target Node must exist in Tree.
-    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    E_Status_t state = __LINK_BiTree_findNode (ppHead,ppTarget);
     __exitReturn( state!=kStatus_Success                        , state             );
     
     // New Node shouldn't be in Tree.
-    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    state = __LINK_BiTree_findNode (ppHead,ppNew);
     __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
     
     __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
@@ -272,7 +272,7 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2r         )  (__LinkBiTreeNode ** 
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2l         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+E_Status_t __LINK_BiTree_addNode_l2l           (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
     __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
     __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
     
@@ -280,11 +280,11 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2l         )  (__LinkBiTreeNode ** 
     __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
     
     // Target Node must exist in Tree.
-    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    E_Status_t state = __LINK_BiTree_findNode (ppHead,ppTarget);
     __exitReturn( state!=kStatus_Success                        , state             );
     
     // New Node shouldn't be in Tree.
-    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    state = __LINK_BiTree_findNode (ppHead,ppNew);
     __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
     
     __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
@@ -298,7 +298,7 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2l         )  (__LinkBiTreeNode ** 
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2l         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+E_Status_t __LINK_BiTree_addNode_r2l           (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
     __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
     __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
     
@@ -306,11 +306,11 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2l         )  (__LinkBiTreeNode ** 
     __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
     
     // Target Node must exist in Tree.
-    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    E_Status_t state = __LINK_BiTree_findNode (ppHead,ppTarget);
     __exitReturn( state!=kStatus_Success                        , state             );
     
     // New Node shouldn't be in Tree.
-    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    state = __LINK_BiTree_findNode (ppHead,ppNew);
     __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
     
     __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
@@ -324,7 +324,7 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2l         )  (__LinkBiTreeNode ** 
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2r         )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
+E_Status_t __LINK_BiTree_addNode_r2r           (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew){
     __exitReturn( ppHead==NULL || ppTarget==NULL || ppNew==NULL , kStatus_BadAccess );
     __exitReturn(*ppHead==NULL ||*ppTarget==NULL ||*ppNew==NULL , kStatus_BadAccess );
     
@@ -332,11 +332,11 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2r         )  (__LinkBiTreeNode ** 
     __exitReturn( (*ppHead)->pPrev!=NULL                        , kStatus_Denied    );
     
     // Target Node must exist in Tree.
-    E_Status_t state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppTarget);
+    E_Status_t state = __LINK_BiTree_findNode (ppHead,ppTarget);
     __exitReturn( state!=kStatus_Success                        , state             );
     
     // New Node shouldn't be in Tree.
-    state = MAKE_FUNC( LINK_BiTree , findNode )(ppHead,ppNew);
+    state = __LINK_BiTree_findNode (ppHead,ppNew);
     __exitReturn(state==kStatus_Success                         , kStatus_Exist     );
     
     __SET_STRUCT_MB( __LinkBiTreeNode, __LinkBiTreeNode*, (*ppNew)          , pPrev , *ppTarget          );
@@ -350,7 +350,7 @@ E_Status_t MAKE_FUNC( LINK_BiTree , addNode_r2r         )  (__LinkBiTreeNode ** 
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( LINK_BiTree , findNode            )  (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget ){
+E_Status_t __LINK_BiTree_findNode              (__LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget ){
     __exitReturn( ppHead   == NULL                , kStatus_BadAccess );
     __exitReturn( ppTarget == NULL                , kStatus_BadAccess );
     __exitReturn(*ppHead==NULL || *ppTarget==NULL , kStatus_NotFound  );
@@ -373,7 +373,7 @@ E_Status_t MAKE_FUNC( LINK_BiTree , findNode            )  (__LinkBiTreeNode ** 
 }
     
     
-E_Status_t MAKE_FUNC( Stack , createBase ) ( __Stack_t ** ptr  ){
+E_Status_t __Stack_createBase  ( __Stack_t ** ptr  ){
     __exitReturn( !ptr   , kStatus_BadAccess );
     *ptr = (__Stack_t*)__malloc(sizeof(__Stack_t));
     __exitReturn( !(*ptr), kStatus_NoSpace   );
@@ -383,7 +383,7 @@ E_Status_t MAKE_FUNC( Stack , createBase ) ( __Stack_t ** ptr  ){
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( Stack , push       ) ( __Stack_t ** ppBase , void* pObject){
+E_Status_t __Stack_push        ( __Stack_t ** ppBase , void* pObject){
     __exitReturn( !ppBase   , kStatus_BadAccess );
     __exitReturn( !*ppBase  , kStatus_BadAccess );
     __exitReturn( !pObject  , kStatus_BadAccess );
@@ -400,22 +400,25 @@ E_Status_t MAKE_FUNC( Stack , push       ) ( __Stack_t ** ppBase , void* pObject
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( Stack , pop        ) ( __Stack_t ** ppBase , void     ** pObject){
+E_Status_t __Stack_pop         ( __Stack_t ** ppBase , void     ** pObject){
     __exitReturn( !ppBase   , kStatus_BadAccess );
     __exitReturn( !*ppBase  , kStatus_BadAccess );
     __exitReturn( !pObject  , kStatus_BadAccess );
     __exitReturn((*ppBase)->pNext==(*ppBase)->pPrev && (*ppBase)->pNext==(*ppBase) , kStatus_Empty );
     
+    void* dummy_ptr = (__Stack_t*)((*ppBase)->pPrev);
+    
     *pObject = (void*)((*ppBase)->pPrev->object);
-    __free((__Stack_t*)((*ppBase)->pPrev));
     
     __SET_STRUCT_MB(__Stack_t, __Stack_t*, (*ppBase)->pPrev->pPrev , pNext, (*ppBase)             );
     __SET_STRUCT_MB(__Stack_t, __Stack_t*, (*ppBase)               , pPrev, (*ppBase)->pPrev->pPrev );
     
+    __free(dummy_ptr);
+    
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( Stack , size       ) ( __Stack_t ** ppBase  , size_t    *  result){
+E_Status_t __Stack_size        ( __Stack_t ** ppBase , size_t    *  result){
     __exitReturn( !ppBase   , kStatus_BadAccess );
     __exitReturn( !*ppBase  , kStatus_BadAccess );
     __exitReturn( !result   , kStatus_BadAccess );
@@ -429,7 +432,7 @@ E_Status_t MAKE_FUNC( Stack , size       ) ( __Stack_t ** ppBase  , size_t    * 
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( Stack , top        ) ( __Stack_t ** ppBase  , void     **  ppObj ){
+E_Status_t __Stack_top         ( __Stack_t ** ppBase , void     **  ppObj ){
     __exitReturn( !ppBase   , kStatus_BadAccess );
     __exitReturn( !*ppBase  , kStatus_BadAccess );
     __exitReturn( !ppObj    , kStatus_BadAccess );
@@ -438,7 +441,7 @@ E_Status_t MAKE_FUNC( Stack , top        ) ( __Stack_t ** ppBase  , void     ** 
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( Stack , empty      ) ( __Stack_t ** ppBase ){
+E_Status_t __Stack_empty       ( __Stack_t ** ppBase ){
     __exitReturn( !ppBase   , kStatus_BadAccess );
     __exitReturn( !*ppBase  , kStatus_BadAccess );
     
@@ -450,7 +453,7 @@ E_Status_t MAKE_FUNC( Stack , empty      ) ( __Stack_t ** ppBase ){
     return kStatus_Success;
 }
     
-E_Status_t MAKE_FUNC( Stack , deleteBase ) ( __Stack_t ** ptr    ){
+E_Status_t __Stack_deleteBase  ( __Stack_t ** ptr    ){
     __exitReturn( !ptr   , kStatus_BadAccess );
     __exitReturn( !*ptr  , kStatus_BadAccess );
     __Stack_t *p = *ptr;
@@ -464,6 +467,12 @@ E_Status_t MAKE_FUNC( Stack , deleteBase ) ( __Stack_t ** ptr    ){
         }
     }
     *ptr = NULL;
+    return kStatus_Success;
+}
+    
+    
+E_Status_t __Queue_createHead  ( __Queue_t ** ptr    ){
+    
     return kStatus_Success;
 }
     

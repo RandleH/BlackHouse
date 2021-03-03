@@ -131,6 +131,10 @@ typedef struct __Region_t __Area_t;
 #define __exitReturn(express,res)            if( express )   return res
 #endif
  
+#ifndef __abort
+#define __abort(express)                     if( express )   while(1)
+#endif
+ 
 #define __array1D(ptr,width,y,x)             (((ptr)+(width)*(y)+(x)))
 #define __array2D(ptr,width,y,x)             (((ptr[0])+(width)*(y)+(x)))
 
