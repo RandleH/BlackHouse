@@ -214,11 +214,72 @@ __Kernel_t* __gussianKernel(double __sigma,size_t order,__Kernel_t* pKernel){
 }
       
 long __pascal_triangle(int row, int col){
-    __exitReturn(col>row || col<0 || row<0 , -1);
-#if SHOW_BUG
-    ???
-#endif
-    return 0;
+    __exitReturn( col>(row<<1) || col<0 || row<0 , -1 );
+
+    struct __Link{
+        struct __Link* pNext;
+        int*           data;
+        size_t         row;
+    };
+    typedef struct __Link __Link;
+    static struct __Link Head = {
+        .pNext = NULL ,
+        .data  = NULL ,
+        .row   = 0
+    };
+    if( Head.data == NULL ){
+        Head.data = (int*)malloc(sizeof(int));
+        Head.data[0] = 1; 
+    }
+
+    __Link* pIter = &Head; 
+    __Link* pOpti = &Head;   
+    __Link* pLast = &Head;
+    
+    int dis_row_min    = row - pIter->row;
+
+    do{
+        // 行差越小，需要迭代的次数就越少
+        if( row > pIter->row && (row-pIter->row) < dis_row_min ){
+            dis_row_min = row - pIter->row;
+            pOpti = pIter;
+        }
+        // 如果就是那一行，即行差为0，则直接返回值
+        if( pIter->row==row ){
+            return ( pIter->data[col] );
+        }
+        // 继续迭代寻找
+        pLast = pIter;
+        pIter = pIter->pNext;
+   
+    }while( pIter != NULL );
+    
+    // 没有找到那一行，则从最接近那一行（pOpti->row）的数值开始向下相邻累加计算，并记录之
+    // 此时 pOpti 代表最佳的那一行数据，pLast为链表最后节点末尾。
+    __Link*  pasc_link = pLast;
+    int*     last_data = pOpti->data; 
+    size_t   pasc_size = pOpti->row+2;                                 // 该行的元素个数为上一行行号+2  
+    
+    while( dis_row_min-- ){
+        pasc_link->pNext    = (__Link*)malloc( sizeof(__Link) );       // 新建一行
+        pasc_link           = pasc_link->pNext;
+        
+
+        pasc_link->data     = (int*)malloc( pasc_size * sizeof(int));   
+        pasc_link->row      = pasc_size-1;                             // 该行行号为该行元素数量-1
+        pasc_link->pNext    = NULL;
+        
+        pasc_link->data[pasc_size-1] = pasc_link->data[0] = 1;        // 该行边界均为1
+        for( int i=1;i<=(pasc_size-1-i);i++ ){
+            pasc_link->data[i] = pasc_link->data[pasc_size-1-i] = last_data[i] + last_data[i-1];
+            
+        }
+
+        last_data           = pasc_link->data;
+        pasc_size           = pasc_link->row+2;
+    }
+
+    return pasc_link->data[col];
 }
       
 inline long __step_mul(long x){ // [!] Limitation: x should be smaller than 20
