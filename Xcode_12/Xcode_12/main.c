@@ -21,23 +21,30 @@ int main(int argc, const char * argv[]) {
                                     .height  = 480  ,
                                     .width   = 800 };
     
-    __Graph_set_penColor(M_COLOR_SILVER);
-    __Graph_rect_fill(0, 0, 799, 479, &BufferInfo, kApplyPixel_fill);
-    __Graph_set_penColor(M_COLOR_PINK);
-    
-    __Graph_set_penSize(18);
-    __Graph_rect_edged(370, 0, 430, 479, &BufferInfo, kApplyPixel_blur);
-    
-    
-    __Graph_circle_edged(400, 240, 101, &BufferInfo, kApplyPixel_blur);
-    
-    __Graph_line_edged(40,40, 340, 90, &BufferInfo, kApplyPixel_fill);
-    
-    __Graph_line_edged(300,40, 500, 40, &BufferInfo, kApplyPixel_fill);
-    __Graph_line_edged(40,300, 40, 400, &BufferInfo, kApplyPixel_fill);
+//    __Graph_set_penColor(M_COLOR_SILVER);
+//    __Graph_rect_fill(0, 0, 799, 479, &BufferInfo, kApplyPixel_fill);
+//    __Graph_set_penColor(M_COLOR_PINK);
+//
+//    __Graph_set_penSize(18);
+//    __Graph_rect_edged(370, 0, 430, 479, &BufferInfo, kApplyPixel_blur);
+//
+//
+//    __Graph_circle_edged(400, 240, 101, &BufferInfo, kApplyPixel_blur);
+//
+//    __Graph_line_edged(40,40, 340, 90, &BufferInfo, kApplyPixel_fill);
+//
+//    __Graph_line_edged(300,40, 500, 40, &BufferInfo, kApplyPixel_fill);
+//    __Graph_line_edged(40,300, 40, 400, &BufferInfo, kApplyPixel_fill);
 //    __Graph_quad_fill(90, 90, 80, 300, 300, 70, 500, 400, &BufferInfo, kApplyPixel_fill);
 
-    __ImgRGB888_out_bmp("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
+//    __ImgRGB888_out_bmp("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
+    
+    for(int y=0;y<19;y++){
+        for(int x=0;x<y+1;x++){
+            printf("%ld ",__pascal_triangle(y, x));
+        }
+        printf("\n");
+    }
     
     return 0;
 }
