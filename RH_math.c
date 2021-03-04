@@ -213,12 +213,19 @@ __Kernel_t* __gussianKernel(double __sigma,size_t order,__Kernel_t* pKernel){
     return pKernel;
 }
       
-long __pascal_triangle(int row, int col){
-    __exitReturn( col>(row<<1) || col<0 || row<0 , -1 );
-
+long __pascal_triangle(long row, long col){
+    __exitReturn( col>row || col<0 || row<0 , -1 );
+    return (__pascal_triangle_row(row, NULL))[col];
+}
+    
+long* __pascal_triangle_row( long row , size_t* returnSize ){
+    __exitReturn( row<0 , NULL );
+    if( returnSize )
+        *returnSize = row+1;
+    
     struct __Link{
         struct __Link* pNext;
-        int*           data;
+        long*           data;
         size_t         row;
     };
     typedef struct __Link __Link;
@@ -228,25 +235,26 @@ long __pascal_triangle(int row, int col){
         .row   = 0
     };
     if( Head.data == NULL ){
-        Head.data = (int*)malloc(sizeof(int));
-        Head.data[0] = 1; 
+        Head.data = (long*)malloc(sizeof(long));
+        Head.data[0] = 1;
     }
 
-    __Link* pIter = &Head; 
-    __Link* pOpti = &Head;   
+    __Link* pIter = &Head;
+    __Link* pOpti = &Head;
     __Link* pLast = &Head;
     
-    int dis_row_min    = row - pIter->row;
-
+    long dis_row_min    = __abs(row - pIter->row);
+    bool sgn            = (row > pIter->row);     // 标志,判断距离目标最近的那一行位于目标的上方还是下方 1 = 上方; 0 = 下方;
     do{
         // 行差越小，需要迭代的次数就越少
-        if( row > pIter->row && (row-pIter->row) < dis_row_min ){
+        if( __abs(row-pIter->row) < dis_row_min ){
+            sgn = (row > pIter->row);
             dis_row_min = row - pIter->row;
             pOpti = pIter;
         }
         // 如果就是那一行，即行差为0，则直接返回值
         if( pIter->row==row ){
-            return ( pIter->data[col] );
+            return ( pIter->data );
         }
         // 继续迭代寻找
         pLast = pIter;
@@ -254,32 +262,52 @@ long __pascal_triangle(int row, int col){
    
     }while( pIter != NULL );
     
-    // 没有找到那一行，则从最接近那一行（pOpti->row）的数值开始向下相邻累加计算，并记录之
-    // 此时 pOpti 代表最佳的那一行数据，pLast为链表最后节点末尾。
+    // 没有找到那一行，则从最接近那一行（pOpti->row）的数值开始向sgn方向计算，并记录之
+    // 此时 pOpti 代表距离最近的那一行数据，pLast为链表最后节点末尾。
     __Link*  pasc_link = pLast;
-    int*     last_data = pOpti->data; 
-    size_t   pasc_size = pOpti->row+2;                                 // 该行的元素个数为上一行行号+2  
-    
-    while( dis_row_min-- ){
-        pasc_link->pNext    = (__Link*)malloc( sizeof(__Link) );       // 新建一行
-        pasc_link           = pasc_link->pNext;
+    long*    last_data = pOpti->data;                                      // 从距离目标最近的那一行开始
+    if( sgn == true ){ // =================================================// 距离最近的那一行位于目标上方
+        long   pasc_size = (pOpti->row)+2;                                 // 该行的元素个数为上一行行号+2
         
-
-        pasc_link->data     = (int*)malloc( pasc_size * sizeof(int));   
-        pasc_link->row      = pasc_size-1;                             // 该行行号为该行元素数量-1
-        pasc_link->pNext    = NULL;
-        
-        pasc_link->data[pasc_size-1] = pasc_link->data[0] = 1;        // 该行边界均为1
-        for( int i=1;i<=(pasc_size-1-i);i++ ){
-            pasc_link->data[i] = pasc_link->data[pasc_size-1-i] = last_data[i] + last_data[i-1];
+        while( dis_row_min-- ){
+            pasc_link->pNext    = (__Link*)malloc( sizeof(__Link) );       // 新建一行
+            pasc_link           = pasc_link->pNext;
             
-        }
 
-        last_data           = pasc_link->data;
-        pasc_size           = pasc_link->row+2;
+            pasc_link->data     = (long*)malloc( pasc_size * sizeof(long) );
+            pasc_link->row      = pasc_size-1;                             // 该行行号为该行元素数量-1
+            pasc_link->pNext    = NULL;
+            
+            pasc_link->data[pasc_size-1] = pasc_link->data[0] = 1;         // 该行边界均为1
+            for( int i=1;i<=(pasc_size-1-i);i++ ){
+                pasc_link->data[i] = pasc_link->data[pasc_size-1-i] = last_data[i] + last_data[i-1];
+            }
+
+            last_data           = pasc_link->data;
+            pasc_size           = pasc_link->row+2;
+        }
+    }else{ // =============================================================// 距离最近的那一行位于目标下方
+        long   pasc_size = (pOpti->row)-2;                                 // 该行的元素个数为下一行行号-2
+        
+        while( dis_row_min-- ){
+            pasc_link->pNext    = (__Link*)malloc( sizeof(__Link) );       // 新建一行
+            pasc_link           = pasc_link->pNext;
+            
+            pasc_link->data     = (long*)malloc( pasc_size * sizeof(long) );
+            pasc_link->row      = pasc_size-1;                             // 该行行号为该行元素数量-1
+            pasc_link->pNext    = NULL;
+            
+            pasc_link->data[pasc_size-1] = pasc_link->data[0] = 1;         // 该行边界均为1
+            for( int i=1;i<=(pasc_size-1-i);i++ ){
+                pasc_link->data[i] = pasc_link->data[pasc_size-1-i] = last_data[i] - pasc_link->data[i-1];
+            }
+            
+            last_data           = pasc_link->data;
+            pasc_size           = pasc_link->row-2;
+        }
     }
 
-    return pasc_link->data[col];
+    return pasc_link->data;
 }
       
 inline long __step_mul(long x){ // [!] Limitation: x should be smaller than 20
@@ -294,10 +322,7 @@ inline long __step_mul(long x){ // [!] Limitation: x should be smaller than 20
       
 long __comb(long num,long m){
     __exitReturn(m>num || m<0 || num<0 , -1);
-#if SHOW_BUG
-    ???
-#endif
-    return 0;
+    return __pascal_triangle(num, m);
 }
       
 long __fibonacci(long n){

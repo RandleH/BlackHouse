@@ -30,7 +30,9 @@ __Kernel_t*  __gussianKernel   (double __sigma,size_t order,__Kernel_t* pKernel)
  
 long         __step_mul        (long   x);
 long         __fibonacci       (long   n);
-long         __pascal_triangle (int    row, int col);
+
+long         __pascal_triangle     ( long row , long col );
+long*        __pascal_triangle_row ( long row , size_t* returnSize );
 
 /*=====================================================================
  > Quantity Reference
