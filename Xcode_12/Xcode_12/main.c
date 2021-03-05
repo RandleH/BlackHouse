@@ -39,12 +39,7 @@ int main(int argc, const char * argv[]) {
 
 //    __ImgRGB888_out_bmp("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
     
-    for(int y=0;y<19;y++){
-        for(int x=0;x<y+1;x++){
-            printf("%ld ",__pascal_triangle(y, x));
-        }
-        printf("\n");
-    }
+    
     
     return 0;
 }

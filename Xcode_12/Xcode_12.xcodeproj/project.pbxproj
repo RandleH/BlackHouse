@@ -50,6 +50,8 @@
 		E3CC874B25E92D0A00202EC4 /* RH_dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_dsp.h; path = ../RH_dsp.h; sourceTree = "<group>"; };
 		E3CC874F25E93E0000202EC4 /* RH_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_color.h; path = ../RH_color.h; sourceTree = "<group>"; };
 		E3CC875025E93E0000202EC4 /* RH_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_config.h; path = ../RH_config.h; sourceTree = "<group>"; };
+		E3F8E98725F281220009B2F2 /* RH_font.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RH_font.h; path = ../RH_font.h; sourceTree = "<group>"; };
+		E3F8E98825F281220009B2F2 /* RH_font.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = RH_font.c; path = ../RH_font.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,8 @@
 		E3CC873525E92CDA00202EC4 /* BlackHouse */ = {
 			isa = PBXGroup;
 			children = (
+				E3F8E98825F281220009B2F2 /* RH_font.c */,
+				E3F8E98725F281220009B2F2 /* RH_font.h */,
 				E3A5F59025EB794A00B917B0 /* RH_dummy.c */,
 				E3CC874F25E93E0000202EC4 /* RH_color.h */,
 				E3CC875025E93E0000202EC4 /* RH_config.h */,
