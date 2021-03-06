@@ -169,7 +169,7 @@ static  __GraphPixel_t __ApplyPixel_cpblur   (int x,int y,__GraphPixel_t nan   ,
 
 
      
-E_Status_t __Graph_init                (void                        ){
+E_Status_t __Graph_init                (void){
     GCFG.blur_br_100 = 100;
     GCFG.blur_size   = 44100;
     GCFG.penColor    = M_COLOR_WHITE;
@@ -182,33 +182,37 @@ E_Status_t __Graph_init                (void                        ){
     return kStatus_Success;
 }
  
-E_Status_t __Graph_set_penSize         (size_t         penSize      ){
-    E_Status_t state = kStatus_Success;
+void __Graph_set_penSize         (size_t         penSize      ){
     if(penSize >0xff){
         penSize = 0xff;
-        state = kStatus_Denied;
     }
     GCFG.penSize = penSize;
-    
-    return state;
 }
-    
-E_Status_t __Graph_set_penColor        (__GraphPixel_t penColor     ){
+void __Graph_set_penColor        (__GraphPixel_t penColor     ){
     GCFG.penColor = penColor;
-    return kStatus_Success;
 }
-    
-E_Status_t __Graph_set_blurSize        (size_t         size_0_65535 ){
+void __Graph_set_blurSize        (size_t         size_0_65535 ){
     GCFG.blur_size = __limit((unsigned int)(size_0_65535), 0U, 65535U);
-    return kStatus_Success;
+}
+void __Graph_set_blurBrightness  (size_t         br_100       ){
+    GCFG.blur_br_100 = __limit((unsigned int)(br_100), 0, 200);
+}
+
+__GraphPixel_t __Graph_get_penColor       (void){
+    return GCFG.penColor;
+}
+size_t         __Graph_get_penSize        (void){
+    return GCFG.penSize;
+}
+size_t         __Graph_get_blurSize       (void){
+    return GCFG.blur_size;
+}
+size_t         __Graph_get_blurBrightness (void){
+    return GCFG.blur_br_100;
 }
     
-E_Status_t __Graph_set_blurBrightness  (size_t         br_100       ){
-    GCFG.blur_br_100 = __limit((unsigned int)(br_100), 0, 200);
-    return kStatus_Success;
-}
-
-
+    
+    
 /*===========================================
  > 插入一个空心圆,线宽为1
 ============================================*/

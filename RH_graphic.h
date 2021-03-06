@@ -35,11 +35,17 @@ typedef enum{
     kApplyPixel_blur
 }E_ApplyPixel_t;
 
-E_Status_t MAKE_FUNC( Graph , init               ) (void                        );
-E_Status_t MAKE_FUNC( Graph , set_penSize        ) (size_t         penSize      );
-E_Status_t MAKE_FUNC( Graph , set_penColor       ) (__GraphPixel_t penColor     );
-E_Status_t MAKE_FUNC( Graph , set_blurSize       ) (size_t         size_0_65535 );
-E_Status_t MAKE_FUNC( Graph , set_blurBrightness ) (size_t         br_100       );
+E_Status_t     MAKE_FUNC( Graph , init               ) (void);
+
+void           MAKE_FUNC( Graph , set_penSize        ) (size_t         penSize      );
+void           MAKE_FUNC( Graph , set_penColor       ) (__GraphPixel_t penColor     );
+void           MAKE_FUNC( Graph , set_blurSize       ) (size_t         size_0_65535 );
+void           MAKE_FUNC( Graph , set_blurBrightness ) (size_t         br_100       );
+
+size_t         MAKE_FUNC( Graph , get_penSize        ) (void);
+__GraphPixel_t MAKE_FUNC( Graph , get_penColor       ) (void);
+size_t         MAKE_FUNC( Graph , get_blurSize       ) (void);
+size_t         MAKE_FUNC( Graph , get_blurBrightness ) (void);
 
 E_Status_t MAKE_FUNC( Graph , circle_raw   ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , circle_edged ) (int x ,int y ,int d ,        __GraphInfo_t* pInfo, E_ApplyPixel_t method);

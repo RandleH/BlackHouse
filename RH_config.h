@@ -13,9 +13,6 @@ extern "C" {
 #define GRAPHIC_COLOR_TYPE      GRAPHIC_COLOR_RGB888 // < select >
 
 
-
-
-
 #ifdef __cplusplus
 }
 #endif

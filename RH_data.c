@@ -8,7 +8,7 @@ extern "C" {
 /*=====================================================================
  > Data Structure Reference
 ======================================================================*/
-E_Status_t __LINK_Loop_createNode              (__LinkLoopNode **      ptr ){
+E_Status_t __LINK_Loop_createNode              ( __LinkLoopNode **  ptr    ){
     __exitReturn(ptr == NULL  , kStatus_BadAccess );
 
     *ptr =  (__LinkLoopNode*)__malloc(sizeof(__LinkLoopNode));
@@ -19,7 +19,7 @@ E_Status_t __LINK_Loop_createNode              (__LinkLoopNode **      ptr ){
     return kStatus_Success;
 }
       
-E_Status_t __LINK_Loop_createHeadNode          (__LinkLoopNode **      ptr ){
+E_Status_t __LINK_Loop_createHeadNode          ( __LinkLoopNode **  ptr    ){
     E_Status_t state = __LINK_Loop_createNode(ptr);
     __exitReturn(state!=kStatus_Success, state);
 
@@ -29,64 +29,58 @@ E_Status_t __LINK_Loop_createHeadNode          (__LinkLoopNode **      ptr ){
     return kStatus_Success;
 }
 
-E_Status_t __LINK_Loop_addNode_tail            (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppNewNode){
-  __exitReturn(  ppHeadNode == NULL ||  ppNewNode == NULL , kStatus_BadAccess);
-  __exitReturn( *ppHeadNode == NULL || *ppNewNode == NULL , kStatus_BadAccess);
-  
-  const __LinkLoopNode* pHeadNode = *ppHeadNode;
-  const __LinkLoopNode* pNewNode  = *ppNewNode;
-  // Check whether it was already exist.
-  const __LinkLoopNode* pTmp = pHeadNode;
-  do{
-      if( pTmp == pNewNode )
-          return kStatus_Exist;
-      pTmp = pTmp->pNext;
-  }while( pTmp != pHeadNode );
-  // Every thing is OK.
-  
-  // Things to do for the new Node.
-  __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pPrev,pHeadNode->pPrev   );
-  __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pNext,pHeadNode          );
+E_Status_t __LINK_Loop_addNode_tail            ( __LinkLoopNode **  ppHead , void* object ){
+    __exitReturn(  ppHead == NULL  , kStatus_BadAccess);
+    __exitReturn( *ppHead == NULL  , kStatus_BadAccess);
 
-  // Things to do for the neighbour.
-  __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode->pPrev,pNext,pNewNode           );
-  __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode       ,pPrev,pNewNode           );
-  
-  // Same Effect: pNewNode->pPrev = pHeadNode->pPrev; // But to cope with <const>.
-  // Same Effect: pNewNode->pNext = pHeadNode;        // But to cope with <const>.
-  
-  // Same Effect: pHeadNode->pPrev->pNext = pNewNode; // But to cope with <const>.
-  // Same Effect: pHeadNode->pPrev        = pNewNode; // But to cope with <const>.
-  
-  return kStatus_Success;
+    __LinkLoopNode* pHeadNode = *ppHead;
+    __LinkLoopNode* pNewNode  = (__LinkLoopNode*)__malloc( sizeof(__LinkLoopNode) );
+    
+    __exitReturn( pNewNode == NULL  , kStatus_NoSpace );
+    pNewNode->object = object;
+
+    // Things to do for the new Node.
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pPrev,pHeadNode->pPrev   );
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pNext,pHeadNode          );
+
+    // Things to do for the neighbour.
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode->pPrev,pNext,pNewNode           );
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode       ,pPrev,pNewNode           );
+
+    return kStatus_Success;
 }
       
-E_Status_t __LINK_Loop_addNode_tail_newhead    (__LinkLoopNode **      ppHeadNode ,__LinkLoopNode *const* ppNewNode){
-  
-    E_Status_t state = __LINK_Loop_addNode_tail   (ppHeadNode, ppNewNode);
-    __exitReturn(state != kStatus_Success, state);
+E_Status_t __LINK_Loop_addNode_tail_newhead    ( __LinkLoopNode **  ppHead , void* object ){
+    __exitReturn(  ppHead == NULL  , kStatus_BadAccess);
+    __exitReturn( *ppHead == NULL  , kStatus_BadAccess);
+
+    __LinkLoopNode* pHeadNode = *ppHead;
+    __LinkLoopNode* pNewNode  = (__LinkLoopNode*)__malloc( sizeof(__LinkLoopNode) );
     
+    __exitReturn( pNewNode == NULL  , kStatus_NoSpace );
+    pNewNode->object = object;
+
+    // Things to do for the new Node.
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pPrev,pHeadNode->pPrev   );
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pNext,pHeadNode          );
+
+    // Things to do for the neighbour.
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode->pPrev,pNext,pNewNode           );
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode       ,pPrev,pNewNode           );
     // New Head
-    *ppHeadNode = *ppNewNode;
+    *ppHead = pNewNode;
 
     return kStatus_Success;
 }
 
-E_Status_t __LINK_Loop_addNode_front           (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppNewNode){
-    __exitReturn(  ppHeadNode == NULL ||  ppNewNode == NULL , kStatus_BadAccess);
-    __exitReturn( *ppHeadNode == NULL || *ppNewNode == NULL , kStatus_BadAccess);
+E_Status_t __LINK_Loop_addNode_front           ( __LinkLoopNode **  ppHead , void* object ){
+    __exitReturn(  ppHead == NULL , kStatus_BadAccess);
+    __exitReturn( *ppHead == NULL , kStatus_BadAccess);
     
-    const __LinkLoopNode* pHeadNode = *ppHeadNode;
-    const __LinkLoopNode* pNewNode  = *ppNewNode;
-    // Check whether it was already exist.
-    const __LinkLoopNode* pTmp = pHeadNode;
-    do{
-        if( pTmp == pNewNode )
-            return kStatus_Exist;
-        pTmp = pTmp->pNext;
-    }while( pTmp != pHeadNode );
-    // Every thing is OK.
-    
+    __LinkLoopNode* pHeadNode = *ppHead;
+    __LinkLoopNode* pNewNode  = (__LinkLoopNode*)__malloc( sizeof(__LinkLoopNode) );
+    __exitReturn( pNewNode == NULL , kStatus_NoSpace );
+
     // Things to do for the new Node.
     __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pPrev,pHeadNode          );
     __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pNext,pHeadNode->pNext   );
@@ -95,36 +89,39 @@ E_Status_t __LINK_Loop_addNode_front           (__LinkLoopNode *const* ppHeadNod
     __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode->pNext,pPrev,pNewNode           );
     __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode       ,pNext,pNewNode           );
     
-    // Same Effect: pNewNode->pPrev = pHeadNode;        // But to cope with <const>.
-    // Same Effect: pNewNode->pNext = pHeadNode->pNext; // But to cope with <const>.
-    
-    // Same Effect: pHeadNode->pNext->pPrev = pNewNode; // But to cope with <const>.
-    // Same Effect: pHeadNode->pNext        = pNewNode; // But to cope with <const>.
-    
     return kStatus_Success;
 }
 
-E_Status_t __LINK_Loop_addNode_front_newhead   (__LinkLoopNode **      ppHeadNode ,__LinkLoopNode *const* ppNewNode){
-    E_Status_t state = MAKE_FUNC(LINK_Loop , addNode_front)(ppHeadNode, ppNewNode);
-    __exitReturn(state!=kStatus_Success, state);
+E_Status_t __LINK_Loop_addNode_front_newhead   ( __LinkLoopNode **  ppHead , void* object ){
+    __exitReturn(  ppHead == NULL , kStatus_BadAccess);
+    __exitReturn( *ppHead == NULL , kStatus_BadAccess);
     
+    __LinkLoopNode* pHeadNode = *ppHead;
+    __LinkLoopNode* pNewNode  = (__LinkLoopNode*)__malloc( sizeof(__LinkLoopNode) );
+    __exitReturn( pNewNode == NULL , kStatus_NoSpace );
+    
+    // Things to do for the new Node.
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pPrev,pHeadNode          );
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pNewNode        ,pNext,pHeadNode->pNext   );
+  
+    // Things to do for the neighbour.
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode->pNext,pPrev,pNewNode           );
+    __SET_STRUCT_MB(__LinkLoopNode,__LinkLoopNode*,pHeadNode       ,pNext,pNewNode           );
     // New Head
-    *ppHeadNode = *ppNewNode;
+    *ppHead = pNewNode;
 
     return kStatus_Success;
 }
 
-E_Status_t __LINK_Loop_findNode                (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppTarget ){
-    __exitReturn(  ppHeadNode == NULL ||  ppTarget == NULL , kStatus_BadAccess);
-    const __LinkLoopNode* pHeadNode = *ppHeadNode;
-    const __LinkLoopNode* pTarget   = *ppTarget;
-    __exitReturn(pHeadNode==NULL, kStatus_BadAccess);
-    __exitReturn(pTarget==NULL  , kStatus_NotFound);
+E_Status_t __LINK_Loop_findNode                ( __LinkLoopNode **  ppHead , void* object ){
+    __exitReturn(  ppHead == NULL || *ppHead==NULL , kStatus_BadAccess);
+    
+    __LinkLoopNode* pHeadNode = *ppHead;
     
     const __LinkLoopNode* pTmp  = pHeadNode;
     
     do{
-        if (pTmp == pTarget) {
+        if (pTmp->object ==  object ) {
             return kStatus_Success;
         }
         pTmp = pTmp->pNext;
@@ -132,90 +129,38 @@ E_Status_t __LINK_Loop_findNode                (__LinkLoopNode *const* ppHeadNod
     return kStatus_NotFound;
 }
 
-E_Status_t __LINK_Loop_checkLoopNode           (__LinkLoopNode *const* ppHeadNode){
-    __exitReturn(ppHeadNode == NULL , kStatus_BadAccess);
-    __LinkLoopNode* pHeadNode = *ppHeadNode;
-    __exitReturn(pHeadNode == NULL  , kStatus_BadAccess);
-    const __LinkLoopNode* pFast = pHeadNode;
-    const __LinkLoopNode* pSlow = pHeadNode;
-  
-    // Search the entire chain. o(n)  :-)
-    while(pSlow->pNext != pHeadNode){
-        pSlow = pSlow->pNext;
-        pFast = pFast->pNext->pNext;
-        if( pSlow==pFast )
-            return kStatus_Exist;
-    }
+E_Status_t __LINK_Loop_removeNode              ( __LinkLoopNode **  ppHead , void* object ){
+    __exitReturn(  ppHead==NULL , kStatus_BadAccess );
+    __exitReturn( *ppHead==NULL , kStatus_BadAccess );
+    __LinkLoopNode* pHeadNode = *ppHead;
+    const __LinkLoopNode* pTmp      = pHeadNode;
     
-    return kStatus_Success;
+    do{
+        if (pTmp->object ==  object ) {
+            // Connect the neighbour and isolate the <pTarget>.
+            __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTmp->pPrev, pNext, pTmp->pNext);
+            __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTmp->pNext, pPrev, pTmp->pPrev);
+            // Same Effect: pTarget->pPrev->pNext = pTarget->pNext; // But to cope with <const>.
+            // Same Effect: pTarget->pNext->pPrev = pTarget->pPrev; // But to cope with <const>.
+            
+            __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTmp, pNext, NULL);
+            __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTmp, pPrev, NULL);
+            // Same Effect: pTarget->pNext = NULL; // But to cope with <const>.
+            // Same Effect: pTarget->pPrev = NULL; // But to cope with <const>.
+            __free((void*)pTmp);
+            return kStatus_Success;
+        }
+        pTmp = pTmp->pNext;
+    }while( pTmp != pHeadNode );
+    
+    return kStatus_NotFound;
 }
 
-E_Status_t __LINK_Loop_deleteNode              (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode **      ppTarget ){
-    E_Status_t state = MAKE_FUNC(LINK_Loop , removeNode)(ppHeadNode, ppTarget);
-    __exitReturn(state!=kStatus_Success , state             );
-    
-    __LinkLoopNode* pTarget   = *ppTarget;
-    __free(pTarget);  // You should release anything in this node before deleting it.
-    *ppTarget = NULL;
-    return kStatus_Success;
-}
-
-E_Status_t __LINK_Loop_removeNode              (__LinkLoopNode *const* ppHeadNode ,__LinkLoopNode *const* ppTarget ){
-    __exitReturn( ppHeadNode==NULL || ppTarget==NULL,kStatus_BadAccess );
-    __LinkLoopNode* pHeadNode = *ppHeadNode;
-    __LinkLoopNode* pTarget   = *ppTarget;
-    __exitReturn( pHeadNode==NULL||pTarget==NULL    , kStatus_BadAccess);
-    __exitReturn( pHeadNode==pTarget                ,kStatus_Denied    );
-    
-    E_Status_t state = MAKE_FUNC( LINK_Loop,findNode)(ppHeadNode,ppTarget);
-    __exitReturn(state != kStatus_Success           ,state             );
+E_Status_t __LINK_Loop_printAllNodesAdr        ( __LinkLoopNode **  ppHead , int(*PRINTF_FUNC)(const char*,...)){
   
-    // Connect the neighbour and isolate the <pTarget>.
-    __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTarget->pPrev, pNext, pTarget->pNext);
-    __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTarget->pNext, pPrev, pTarget->pPrev);
-    // Same Effect: pTarget->pPrev->pNext = pTarget->pNext; // But to cope with <const>.
-    // Same Effect: pTarget->pNext->pPrev = pTarget->pPrev; // But to cope with <const>.
+    __exitReturn(ppHead == NULL, kStatus_BadAccess);
     
-    __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTarget, pNext, NULL);
-    __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTarget, pPrev, NULL);
-    // Same Effect: pTarget->pNext = NULL; // But to cope with <const>.
-    // Same Effect: pTarget->pPrev = NULL; // But to cope with <const>.
-    
-    return kStatus_Success;
-}
-
-E_Status_t __LINK_Loop_removeAllNodes          (__LinkLoopNode *const* ppHeadNode){
-    __exitReturn(ppHeadNode==NULL, kStatus_BadAccess);
-    
-    E_Status_t state = MAKE_FUNC(LINK_Loop,checkLoopNode)(ppHeadNode);
-    __exitReturn(state!=kStatus_Success ,state            );
-    
-    __LinkLoopNode* pHeadNode = *ppHeadNode;
-    __LinkLoopNode* pTmpCur  = (__LinkLoopNode*)(pHeadNode->pNext);
-    __LinkLoopNode* pTmpNxt  = (__LinkLoopNode*)(pTmpCur->pNext);
-    while(pTmpCur != pHeadNode){
-//        pTmpCur->pNext  = NULL;
-//        pTmpCur->pPrev  = NULL;
-        __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTmpCur, pNext, NULL);
-        __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pTmpCur, pPrev, NULL);
-        pTmpCur = pTmpNxt;
-        pTmpNxt = (__LinkLoopNode*)(pTmpNxt->pNext);
-    }
-  
-    
-    __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pHeadNode, pNext, pHeadNode);
-    __SET_STRUCT_MB(__LinkLoopNode, __LinkLoopNode*, pHeadNode, pPrev, pHeadNode);
-//    pHeadNode->pNext  = pHeadNode;
-//    pHeadNode->pPrev  = pHeadNode;
-  
-    return kStatus_Success;
-}
-
-E_Status_t __LINK_Loop_printAllNodesAdr        (__LinkLoopNode *const* ppHeadNode,int(*PRINTF_FUNC)(const char*,...)){
-  
-    __exitReturn(ppHeadNode == NULL, kStatus_BadAccess);
-    
-    const __LinkLoopNode* pHeadNode = *ppHeadNode;
+    const __LinkLoopNode* pHeadNode = *ppHead;
     const __LinkLoopNode* pTmp      = pHeadNode;
     size_t cnt = 0;
     do{
