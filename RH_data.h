@@ -19,15 +19,12 @@ struct __LinkLoopNode{
 };
 typedef struct __LinkLoopNode __LinkLoopNode;
 
-E_Status_t MAKE_FUNC( LINK_Loop , createNode            ) ( __LinkLoopNode  **  ptr    );
-E_Status_t MAKE_FUNC( LINK_Loop , createHeadNode        ) ( __LinkLoopNode  **  ptr    );
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_tail          ) ( __LinkLoopNode  **  ppHead , void* object );
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_tail_newhead  ) ( __LinkLoopNode  **  ppHead , void* object ); 
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_front         ) ( __LinkLoopNode  **  ppHead , void* object ); 
-E_Status_t MAKE_FUNC( LINK_Loop , addNode_front_newhead ) ( __LinkLoopNode  **  ppHead , void* object ); 
-E_Status_t MAKE_FUNC( LINK_Loop , findNode              ) ( __LinkLoopNode  **  ppHead , void* object );
-E_Status_t MAKE_FUNC( LINK_Loop , removeNode            ) ( __LinkLoopNode  **  ppHead , void* object );
-E_Status_t MAKE_FUNC( LINK_Loop , printAllNodesAdr      ) ( __LinkLoopNode  **  ppHead , int(*PRINTF_FUNC)(const char*,...));
+E_Status_t MAKE_FUNC( LINK_Loop , createHead        ) ( __LinkLoopNode  **  ptr    , void* object );
+E_Status_t MAKE_FUNC( LINK_Loop , add               ) ( __LinkLoopNode  **  ppHead , void* object );
+E_Status_t MAKE_FUNC( LINK_Loop , find              ) ( __LinkLoopNode  **  ppHead , void* object );
+E_Status_t MAKE_FUNC( LINK_Loop , remove            ) ( __LinkLoopNode  **  ppHead , void* object );
+E_Status_t MAKE_FUNC( LINK_Loop , removeAll         ) ( __LinkLoopNode  **  ppHead );
+E_Status_t MAKE_FUNC( LINK_Loop , printAllNodesAdr  ) ( __LinkLoopNode  **  ppHead , int(*PRINTF_FUNC)(const char*,...));
 
 struct __LinkBiTreeNode{
     void*        object;
@@ -37,7 +34,7 @@ struct __LinkBiTreeNode{
 };
 typedef struct __LinkBiTreeNode __LinkBiTreeNode;
 
-E_Status_t MAKE_FUNC( LINK_BiTree , createNode          ) ( __LinkBiTreeNode ** ptr );
+//E_Status_t MAKE_FUNC( LINK_BiTree , createNode          ) ( __LinkBiTreeNode ** ptr );
 E_Status_t MAKE_FUNC( LINK_BiTree , createHeadNode      ) ( __LinkBiTreeNode ** ptr );
 E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2r         ) ( __LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew);
 E_Status_t MAKE_FUNC( LINK_BiTree , addNode_l2l         ) ( __LinkBiTreeNode ** ppHead , __LinkBiTreeNode ** ppTarget , __LinkBiTreeNode ** ppNew);
