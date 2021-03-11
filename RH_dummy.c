@@ -29,41 +29,130 @@ __Area_t AREA = {
     .height = 3
 };
 
+__Blur_Average_ImgRGB888(&in,&out,&AREA,10,100);
+
+#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+            while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
+            while(1);
+#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
+            __Blur_Average_ImgRGB888(pInfo, &GCFG.blur_tmp, &GCFG.blur_area, GCFG.blur_size, GCFG.blur_br_100);
+#else
+  #error "[RH_graphic]: Unknown color type."
+#endif
+
+const char* __restrict__ src  = "/Users/randle_h/desktop/lenna.bmp";
+const char* __restrict__ des  = "/Users/randle_h/desktop/lenna_.bmp";
+
+__ImageRGB888_t* IMG_IN  = __LoadBMP_ImgRGB888(src);
+__Area_t         AREA    = {
+    .xs = 1,
+    .ys = 1,
+    .width  = 300,
+    .height = 300
+};
+__ImageRGB888_t* IMG_OUT = __Create_ImgRGB888(AREA.width, AREA.height);
+
+
+__Blur_Average_ImgRGB888(IMG_IN,IMG_OUT,&AREA,40000,100);
+__OutBMP_ImgRGB888(des, IMG_OUT);
+
+
 
 ( *applyPixelMethod [method] )(x1,y1,GCFG.penColor,pInfo);
 
-__UNION_PixelRGB888_t Screen_buffer[480][800] = {0};
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
+long __pascal_triangle(int row, int col){
+    __exitReturn( col>row || col<0 || row<0 , -1 );
 
-    __GraphInfo_t BufferInfo = {    .pBuffer = Screen_buffer[0],
-                                    .height  = 480  ,
-                                    .width   = 800 };
+    struct __Link{
+        struct __Link* pNext;
+        int*           data;
+        size_t         row;
+    };
+    typedef struct __Link __Link;
+    static struct __Link Head = {
+        .pNext = NULL ,
+        .data  = NULL ,
+        .row   = 0
+    };
+    if( Head.data == NULL ){
+        Head.data = (int*)malloc(sizeof(int));
+        Head.data[0] = 1;
+    }
+
+    __Link* pIter = &Head;
+    __Link* pOpti = &Head;
+    __Link* pLast = &Head;
     
-    __Graph_set_penColor(M_COLOR_SILVER);
-    __Graph_rect_fill(0, 0, 799, 479, &BufferInfo, kApplyPixel_fill);
-    __Graph_set_penColor(M_COLOR_PINK);
+    long dis_row_min    = row - pIter->row;
 
-    __Graph_set_penSize(18);
-    __Graph_rect_edged(370, 0, 430, 479, &BufferInfo, kApplyPixel_blur);
-
-
-    __Graph_circle_edged(400, 240, 101, &BufferInfo, kApplyPixel_blur);
-
-    __Graph_line_edged(40,40, 340, 90, &BufferInfo, kApplyPixel_fill);
-
-    __Graph_line_edged(300,40, 500, 40, &BufferInfo, kApplyPixel_fill);
-    __Graph_line_edged(40,300, 40, 400, &BufferInfo, kApplyPixel_fill);
-    __Graph_quad_fill(90, 90, 80, 300, 300, 70, 500, 400, &BufferInfo, kApplyPixel_fill);
-
-    __ImgRGB888_out_bmp("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
+    do{
+        // 行差越小，需要迭代的次数就越少
+        if( row > pIter->row && (row-pIter->row) < dis_row_min ){
+            dis_row_min = row - pIter->row;
+            pOpti = pIter;
+        }
+        // 如果就是那一行，即行差为0，则直接返回值
+        if( pIter->row==row ){
+            return ( pIter->data[col] );
+        }
+        // 继续迭代寻找
+        pLast = pIter;
+        pIter = pIter->pNext;
+   
+    }while( pIter != NULL );
     
-    return 0;
+    // 没有找到那一行，则从最接近那一行（pOpti->row）的数值开始向下相邻累加计算，并记录之
+    // 此时 pOpti 代表最佳的那一行数据，pLast为链表最后节点末尾。
+    __Link*  pasc_link = pLast;
+    int*     last_data = pOpti->data;
+    size_t   pasc_size = pOpti->row+2;                                 // 该行的元素个数为上一行行号+2
+    
+    while( dis_row_min-- ){
+        pasc_link->pNext    = (__Link*)malloc( sizeof(__Link) );       // 新建一行
+        pasc_link           = pasc_link->pNext;
+        
+
+        pasc_link->data     = (int*)malloc( pasc_size * sizeof(int));
+        pasc_link->row      = pasc_size-1;                             // 该行行号为该行元素数量-1
+        pasc_link->pNext    = NULL;
+        
+        pasc_link->data[pasc_size-1] = pasc_link->data[0] = 1;        // 该行边界均为1
+        for( int i=1;i<=(pasc_size-1-i);i++ ){
+            pasc_link->data[i] = pasc_link->data[pasc_size-1-i] = last_data[i] + last_data[i-1];
+            
+        }
+
+        last_data           = pasc_link->data;
+        pasc_size           = pasc_link->row+2;
+    }
+
+    return pasc_link->data[col];
 }
 
 
+
+#ifndef __RH_ASSERT_H
+#define __RH_ASSERT_H
+
+#ifdef __cpluplus
+extern "C"{
+#endif
+
+
+#ifdef __cpluplus
+}
+#endif
+
+#endif
+
+const char* path_in  = "D:\\Personal\\Desktop\\temp.bmp";
+const char* path_out = "D:\\Personal\\Desktop\\out.bmp";
+__ImageRGB565_t* IMG_IN  = __ImgRGB565_load_bmp(path_in);
+__ImageRGB565_t* IMG_OUT = __ImgRGB565_create( IMG_IN->width , IMG_IN->height );
+__ImgRGB565_copy( IMG_IN, IMG_OUT );
+__ImgRGB565_out_bmp( path_out, IMG_OUT );
 #endif
 
 
