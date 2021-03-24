@@ -8,8 +8,92 @@ extern "C" {
 /*=====================================================================
  > Data Structure Reference
 ======================================================================*/
+    
+__LinkDB_t*    __LINK_DB_createHead          ( void* object ){
+    __LinkDB_t *ptr = (__LinkDB_t*)__malloc(sizeof(__LinkDB_t));
+#ifdef RH_DEBUG
+    ASSERT( ptr );
+#endif
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,ptr,pNext  ,NULL);
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,ptr,pPrev  ,NULL);
+    ptr->object = object;
+    
+    return ptr;
+}
+    
+__LinkDB_t*    __LINK_DB_addTail             ( const __LinkDB_t *pHead , void* object ){
+#ifdef RH_DEBUG
+    ASSERT( pHead );
+#endif
+    
+    __LinkDB_t* pNewNode  = (__LinkDB_t*)__malloc( sizeof(__LinkDB_t) );
+#ifdef RH_DEBUG
+    ASSERT( pNewNode );
+#endif
+    pNewNode->object = object;
+    
+    const __LinkDB_t* pIter = pHead;
+    while( pIter->pNext != NULL ){
+        pIter = pIter->pNext;
+    }
+    
+    // Things to do for the new Node.
+    __SET_STRUCT_MB(__LinkDB_t,__LinkDB_t*,pNewNode    ,pPrev,pIter    );
+    __SET_STRUCT_MB(__LinkDB_t,__LinkDB_t*,pNewNode    ,pNext,NULL     );
+    
+    // Things to do for the neighbour.
+    __SET_STRUCT_MB(__LinkDB_t,__LinkDB_t*,pIter       ,pNext,pNewNode );
+    
+    return pNewNode;
+}
+    
+__LinkDB_t*    __LINK_DB_insert              ( const __LinkDB_t *pHead , void* Tobject, void* object ){
+#ifdef RH_DEBUG
+    ASSERT( pHead );
+#endif
+    
+    __LinkDB_t* pNewNode  = (__LinkDB_t*)__malloc( sizeof(__LinkDB_t) );
+
+    const __LinkDB_t* pTmp  = pHead;
+    do{
+        if (pTmp->object ==  Tobject ) {
+            goto FOUND_TOBJ;
+        }
+        pTmp = pTmp->pNext;
+    }while( pTmp );
+#ifdef RH_DEBUG
+    ASSERT( false );
+#endif
+FOUND_TOBJ:
+
+    // Things to do for the new Node.
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pNewNode    ,pPrev,pTmp        );
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pNewNode    ,pNext,pTmp->pNext );
+    pNewNode->object = object;
+    
+    // Things to do for the neighbour.
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pTmp        ,pNext,pNewNode    );
+    if( pTmp->pNext )
+        __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pTmp->pNext ,pPrev,pNewNode    );
+    
+    return pNewNode;
+}
+    
+void           __LINK_DB_removeAll           (       __LinkDB_t *pHead ){
+#ifdef RH_DEBUG
+    ASSERT( pHead );
+#endif
+    const __LinkDB_t* pTmp1  = pHead;
+    const __LinkDB_t* pTmp2  = pHead;
+    do{
+        pTmp2 = pTmp1->pNext;
+        __free( (void*)(pTmp1) );
+        pTmp1 = pTmp2;
+    }while( pTmp1 );
+}
+    
       
-__LinkLoop_t * __LINK_Loop_createHead        ( void* object ){
+__LinkLoop_t*  __LINK_Loop_createHead        ( void* object ){
     __LinkLoop_t *ptr = (__LinkLoop_t*)__malloc(sizeof(__LinkLoop_t));
 #ifdef RH_DEBUG
     ASSERT( ptr );
@@ -44,7 +128,38 @@ __LinkLoop_t * __LINK_Loop_add               ( const __LinkLoop_t *pHead , void*
     return pNewNode;
 }
     
-__LinkLoop_t * __LINK_Loop_find              ( const __LinkLoop_t *pHead , void* object ){
+__LinkLoop_t*  __LINK_Loop_insert            ( const __LinkLoop_t *pHead , void* Tobject, void* object ){
+#ifdef RH_DEBUG
+    ASSERT( pHead );
+#endif
+    
+    __LinkLoop_t* pNewNode  = (__LinkLoop_t*)__malloc( sizeof(__LinkLoop_t) );
+
+    const __LinkLoop_t* pTmp  = pHead;
+    do{
+        if (pTmp->object ==  Tobject ) {
+            goto FOUND_TOBJ;
+        }
+        pTmp = pTmp->pNext;
+    }while( pTmp != pHead );
+#ifdef RH_DEBUG
+    ASSERT( false );
+#endif
+FOUND_TOBJ:
+
+    // Things to do for the new Node.
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pNewNode    ,pPrev,pTmp        );
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pNewNode    ,pNext,pTmp->pNext );
+    pNewNode->object = object;
+    
+    // Things to do for the neighbour.
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pTmp        ,pNext,pNewNode    );
+    __SET_STRUCT_MB(__LinkLoop_t,__LinkLoop_t*,pTmp->pNext ,pPrev,pNewNode    );
+    
+    return pNewNode;
+}
+    
+__LinkLoop_t*  __LINK_Loop_find              ( const __LinkLoop_t *pHead , void* object ){
 #ifdef RH_DEBUG
     ASSERT( pHead );
 #endif
@@ -61,7 +176,7 @@ __LinkLoop_t * __LINK_Loop_find              ( const __LinkLoop_t *pHead , void*
     return NULL;
 }
     
-void           __LINK_Loop_remove            ( __LinkLoop_t *pHead , void* object ){
+void           __LINK_Loop_remove            (       __LinkLoop_t *pHead , void* object ){
 
 #ifdef RH_DEBUG
     ASSERT( pHead );
@@ -102,7 +217,7 @@ void           __LINK_Loop_remove            ( __LinkLoop_t *pHead , void* objec
     
 }
     
-void           __LINK_Loop_removeAll         ( __LinkLoop_t *pHead ){
+void           __LINK_Loop_removeAll         (       __LinkLoop_t *pHead ){
 
 #ifdef RH_DEBUG
     ASSERT( pHead );
@@ -131,7 +246,6 @@ void           __LINK_Loop_printAllNodesAdr  ( const __LinkLoop_t *pHead , int(*
 }
     
 
-    
 __LinkBiTree_t* __LINK_BiTree_createHead     ( void* object ){
     __LinkBiTree_t* pNewHead = (__LinkBiTree_t*)__malloc(sizeof(__LinkBiTree_t));
 #ifdef RH_DEBUG
@@ -260,7 +374,7 @@ __LinkBiTree_t* __LINK_BiTree_find           ( const __LinkBiTree_t *pHead , voi
 }
     
     
-__Stack_t* __Stack_createBase  ( void* object ){
+__Stack_t*      __Stack_createBase           ( void* object ){
     __Stack_t *ptr = (__Stack_t*)__malloc(sizeof(__Stack_t));
 #ifdef RH_DEBUG
     ASSERT( ptr );
@@ -272,7 +386,7 @@ __Stack_t* __Stack_createBase  ( void* object ){
     return ptr;
 }
     
-__Stack_t* __Stack_push        ( const __Stack_t *pBase , void* object ){
+__Stack_t*      __Stack_push                 ( const __Stack_t *pBase , void* object ){
 
 #ifdef RH_DEBUG
     ASSERT( pBase );
@@ -293,7 +407,7 @@ __Stack_t* __Stack_push        ( const __Stack_t *pBase , void* object ){
     return pNew;
 }
     
-void*      __Stack_pop         ( const __Stack_t *pBase ){
+void*           __Stack_pop                  ( const __Stack_t *pBase ){
 
 #ifdef RH_DEBUG
     ASSERT( pBase );
@@ -313,7 +427,7 @@ void*      __Stack_pop         ( const __Stack_t *pBase ){
     return object;
 }
     
-size_t     __Stack_size        ( const __Stack_t *pBase ){
+size_t          __Stack_size                 ( const __Stack_t *pBase ){
 
 #ifdef RH_DEBUG
     ASSERT( pBase );
@@ -328,7 +442,7 @@ size_t     __Stack_size        ( const __Stack_t *pBase ){
     return cnt;
 }
     
-void*      __Stack_top         ( const __Stack_t *pBase ){
+void*           __Stack_top                  ( const __Stack_t *pBase ){
 
 #ifdef RH_DEBUG
     ASSERT( pBase );
@@ -336,7 +450,7 @@ void*      __Stack_top         ( const __Stack_t *pBase ){
     return (void*)(pBase->pPrev->object);
 }
     
-bool       __Stack_empty       ( const __Stack_t *pBase ){
+bool            __Stack_empty                ( const __Stack_t *pBase ){
 
 #ifdef RH_DEBUG
     ASSERT( pBase );
@@ -344,7 +458,7 @@ bool       __Stack_empty       ( const __Stack_t *pBase ){
     return (pBase->pNext==pBase->pPrev && pBase->pNext==pBase);
 }
     
-void*      __Stack_deleteBase  ( __Stack_t *pBase    ){
+void*           __Stack_deleteBase           (       __Stack_t *pBase ){
 
 #ifdef RH_DEBUG
     ASSERT( pBase );
@@ -365,17 +479,17 @@ void*      __Stack_deleteBase  ( __Stack_t *pBase    ){
 }
     
     
-E_Status_t __Queue_createHead  ( __Queue_t ** ptr    ){
+E_Status_t      __Queue_createHead           ( void* object ){
     
     return kStatus_Success;
 }
     
     
-static size_t RH_FUNCONST __HashFunc( size_t key ){
-    return (key%RH_HASH_MAP_SIZE);
+static size_t RH_FUNCONST __HashFunc         ( size_t key ){
+    return (key&(RH_HASH_MAP_SIZE-1));
 }
     
-__HashMap_t* __Hash_createMap  ( void ){
+__HashMap_t*    __Hash_createMap             ( void ){
 
     __HashMap_t *pHashHead = __malloc( sizeof(__HashMap_t) );
 #ifdef RH_DEBUG
@@ -389,12 +503,11 @@ __HashMap_t* __Hash_createMap  ( void ){
     memset(pHashList, 0, RH_HASH_MAP_SIZE*sizeof(__HashList_t));
     
     __SET_STRUCT_MB(__HashMap_t, __HashList_t*, pHashHead, pList, pHashList);
-//    (*ptr)->pList = pHashList;
     
     return pHashHead;
 }
     
-void*        __Hash_find       ( const __HashMap_t *pHead, size_t key ){
+void*           __Hash_find                  ( const __HashMap_t *pHead, size_t key ){
 #ifdef RH_DEBUG
     ASSERT(pHead);
 #endif
@@ -410,7 +523,7 @@ void*        __Hash_find       ( const __HashMap_t *pHead, size_t key ){
     return NULL;
 }
     
-void         __Hash_put        ( const __HashMap_t *pHead, size_t key, void* object ){
+void            __Hash_pair                  ( const __HashMap_t *pHead, size_t key, void* object ){
 
 #ifdef RH_DEBUG
     ASSERT( pHead );
@@ -439,7 +552,7 @@ void         __Hash_put        ( const __HashMap_t *pHead, size_t key, void* obj
     
 }
     
-void*        __Hash_get        ( const __HashMap_t *pHead, size_t key ){
+void*           __Hash_get                   ( const __HashMap_t *pHead, size_t key ){
 
 #ifdef RH_DEBUG
     ASSERT( pHead );
@@ -458,7 +571,7 @@ void*        __Hash_get        ( const __HashMap_t *pHead, size_t key ){
     return NULL;
 }
     
-void*        __Hash_remove     ( const __HashMap_t *pHead, size_t key ){
+void*           __Hash_remove                ( const __HashMap_t *pHead, size_t key ){
 #ifdef RH_DEBUG
     ASSERT( pHead );
     ASSERT( pHead->pList );
@@ -479,7 +592,7 @@ void*        __Hash_remove     ( const __HashMap_t *pHead, size_t key ){
     return NULL;
 }
     
-void         __Hash_removeAll  ( __HashMap_t *pHead ){
+void            __Hash_removeAll             (       __HashMap_t *pHead ){
 #ifdef RH_DEBUG
     ASSERT( pHead );
     ASSERT( pHead->pList );

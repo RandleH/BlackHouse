@@ -1,0 +1,21 @@
+gcc -c ../RH_lib.c      
+gcc -c ../RH_math.c     
+gcc -c ../RH_data.c     
+gcc -c ../RH_dsp.c      
+gcc -c ../RH_graphic.c  
+gcc -c ../RH_image.c    
+gcc -c ../RH_utility.c  
+gcc -c ../RH_time.c     
+
+
+ar cr RH_lib.lib      ./RH_lib.o     
+ar cr RH_math.lib     ./RH_math.o    
+ar cr RH_data.lib     ./RH_data.o    
+ar cr RH_dsp.lib      ./RH_dsp.o     
+ar cr RH_graphic.lib  ./RH_graphic.o 
+ar cr RH_image.lib    ./RH_image.o   
+ar cr RH_utility.lib  ./RH_utility.o 
+ar cr RH_time.lib     ./RH_time.o    
+
+
+

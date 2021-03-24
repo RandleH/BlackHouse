@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libRH_utility.a CMakeFiles/RH_utility.dir/Users/randle_h/desktop/BlackHouse/RH_utility.c.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libRH_utility.a

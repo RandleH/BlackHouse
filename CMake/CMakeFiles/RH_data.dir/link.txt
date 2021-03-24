@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libRH_data.a CMakeFiles/RH_data.dir/Users/randle_h/desktop/BlackHouse/RH_data.c.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libRH_data.a

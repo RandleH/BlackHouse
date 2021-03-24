@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libRH_dsp.a CMakeFiles/RH_dsp.dir/Users/randle_h/desktop/BlackHouse/RH_dsp.c.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libRH_dsp.a

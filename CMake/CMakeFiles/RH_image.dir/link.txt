@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libRH_image.a CMakeFiles/RH_image.dir/Users/randle_h/desktop/BlackHouse/RH_image.c.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libRH_image.a
