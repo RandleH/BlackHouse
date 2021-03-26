@@ -231,10 +231,12 @@ __ImageRGB888_t* __ImgRGB888_load_bmp      (const char* __restrict__ path){
 }
 
 __ImageRGB888_t* __ImgRGB888_load_png      (const char* __restrict__ path){
+#pragma pack(1)
 struct {
+    uint32_t chunk_data_lenth;
     uint32_t chunk_type_code;
-    uint32_t width;
-    uint32_t height;
+    uint32_t width;                 /* __SWAP_DWORD */
+    uint32_t height;                /* __SWAP_DWORD */
 
     uint8_t  bit_depth;
     uint8_t  color_type;
@@ -271,7 +273,7 @@ struct {
 #endif
     
     fread( &IHDR, sizeof(IHDR), 1, png );
-    
+    printf("%d\n",__SWAP_DWORD(IHDR.width));
     fclose(png);
     
     return pIMG;
