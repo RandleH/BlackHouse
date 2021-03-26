@@ -6,6 +6,7 @@ gcc -c ../RH_graphic.c
 gcc -c ../RH_image.c    
 gcc -c ../RH_utility.c  
 gcc -c ../RH_time.c     
+gcc -c ../RH_neuron.c
 
 
 ar cr RH_lib.lib      ./RH_lib.o     
@@ -16,6 +17,7 @@ ar cr RH_graphic.lib  ./RH_graphic.o
 ar cr RH_image.lib    ./RH_image.o   
 ar cr RH_utility.lib  ./RH_utility.o 
 ar cr RH_time.lib     ./RH_time.o    
+ar cr RH_neuron.lib   ./RH_neuron.o
 
 
 
