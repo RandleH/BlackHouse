@@ -34,9 +34,9 @@ struct __PixelRGB565_t{
 };
 union __UNION_PixelRGB565_t{
     struct{
-        uint8_t B : 5;
-        uint8_t G : 6;
-        uint8_t R : 5;
+        uint16_t B : 5;
+        uint16_t G : 6;
+        uint16_t R : 5;
     };
     uint16_t data;
 };
@@ -81,8 +81,13 @@ struct __ImageRGB888_t{
 };
 typedef struct __ImageRGB888_t  __ImageRGB888_t;
 
+__ImageBIN_t*    MAKE_FUNC( ImgBIN    , create       ) (size_t width,size_t height);
+__ImageBIN_t*    MAKE_FUNC( ImgBIN    , load_bmp     ) (const char* __restrict__ path);
+__ImageBIN_t*    MAKE_FUNC( ImgBIN    , out_bmp      ) (const char* __restrict__ path,__ImageBIN_t* p);
 
-__ImageBIN_t*    MAKE_FUNC( ImgBIN    , load_bmp     ) (const char* __restrict__ path);//
+__ImageBIN_t*    MAKE_FUNC( ImgBIN    , copy         ) (const __ImageBIN_t* src,__ImageBIN_t* dst);
+
+
 
 
 __ImageRGB565_t* MAKE_FUNC( ImgRGB565 , create       ) (size_t width,size_t height);//

@@ -8,9 +8,9 @@
 extern "C" {
 #endif
 
-#if ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+#if ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_BIN    )
 
-  #define MAKE_COLOR(R_255,G_255,B_255)    (uint8_t)(((R+G+B)/3 > 128)?0xff:0x00)
+  #define MAKE_COLOR(R_255,G_255,B_255)    (uint8_t)(((R_255+G_255+B_255)/3 > 128)?0xff:0x00)
   #define COLOR_MASK_RED                   0x01
   #define COLOR_MASK_GREEN                 0x01
   #define COLOR_MASK_BLUE                  0x01
@@ -18,7 +18,7 @@ extern "C" {
   #define DARKEN_COLOR_1Bit(C)             (uint8_t)((C)&0)
   #define DARKEN_COLOR_2Bit(C)             (uint8_t)((C)&0)
 
-#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565    )
+#elif ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_RGB565    )
 
   #define MAKE_COLOR(R_255,G_255,B_255)    (uint16_t)(((R_255>>3)<<11)|((G_255>>2)<<5)|(B_255>>3))
   #define COLOR_MASK_RED                   0xF800
@@ -28,7 +28,7 @@ extern "C" {
   #define DARKEN_COLOR_1Bit(C)             (uint16_t)( ((((C)&COLOR_MASK_RED)>>1)&(COLOR_MASK_RED))|((((C)&COLOR_MASK_GREEN)>>1)&(COLOR_MASK_GREEN))|((((C)&COLOR_MASK_BLUE)>>1)&(COLOR_MASK_BLUE)) )
   #define DARKEN_COLOR_2Bit(C)             (uint16_t)( ((((C)&COLOR_MASK_RED)>>2)&(COLOR_MASK_RED))|((((C)&COLOR_MASK_GREEN)>>2)&(COLOR_MASK_GREEN))|((((C)&COLOR_MASK_BLUE)>>2)&(COLOR_MASK_BLUE)) )
 
-#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888    )
+#elif ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_RGB888    )
 
   #define MAKE_COLOR(R_255,G_255,B_255)    (uint32_t)((((R_255)&0xff)<<16)|(((G_255)&0xff)<<8)|((B_255)&0xff))
   #define COLOR_MASK_RED                   0x00FF0000

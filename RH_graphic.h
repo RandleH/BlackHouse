@@ -11,13 +11,14 @@
 extern "C" {
 #endif
 
-#if   ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_BIN    )
+
+#if   ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_BIN    )
 typedef __ImageBIN_t           __GraphInfo_t;
-typedef bool                   __GraphPixel_t;
-#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB565 )
+typedef uint8_t                __GraphPixel_t;
+#elif ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_RGB565 )
 typedef __ImageRGB565_t        __GraphInfo_t;
 typedef uint16_t               __GraphPixel_t;
-#elif ( GRAPHIC_COLOR_TYPE == GRAPHIC_COLOR_RGB888 )
+#elif ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_RGB888 )
 typedef __ImageRGB888_t        __GraphInfo_t;
 typedef uint32_t               __GraphPixel_t;
 #else
@@ -32,7 +33,9 @@ typedef enum{
     kApplyPixel_depix   ,
     kApplyPixel_reverse ,
     kApplyPixel_pick    ,
-    kApplyPixel_blur
+    kApplyPixel_blur    ,
+    kApplyPixel_eor     ,
+    NUM_kApplyPixel
 }E_ApplyPixel_t;
 
 E_Status_t     MAKE_FUNC( Graph , init               ) (void);
@@ -67,11 +70,14 @@ E_Status_t MAKE_FUNC( Graph , rect_round   ) (int xs,int ys,int xe,int ye, __Gra
 E_Status_t MAKE_FUNC( Graph , line_raw     ) (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , line_edged   ) (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , line_fill    ) (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+E_Status_t MAKE_FUNC( Graph , line_sausage ) (int x1,int y1,int x2,int y2, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+
 
 E_Status_t MAKE_FUNC( Graph , quad_raw     ) (int x1,int y1,int x2,int y2,int x3,int y3,int x4,int y4, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 E_Status_t MAKE_FUNC( Graph , quad_fill    ) (int x1,int y1,int x2,int y2,int x3,int y3,int x4,int y4, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 
-
+E_Status_t MAKE_FUNC( Graph , sausage_raw  ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
+E_Status_t MAKE_FUNC( Graph , sausage_fill ) (int xs,int ys,int xe,int ye, __GraphInfo_t* pInfo, E_ApplyPixel_t method);
 
 #ifdef __cplusplus
 }

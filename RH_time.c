@@ -31,7 +31,7 @@ volatile const char* __PST2BJT( const char YYYYMMDD_HHMMSS[20] ){
     int sec    = (t[17]-'0')*10 + (t[18]-'0');
     
 #ifdef RH_DEBUG
-    ASSERT(t[19] == '\0');
+    RH_ASSERT(t[19] == '\0');
 #endif
     hour  += 15;
     day   += (hour  > 23);

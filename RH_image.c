@@ -12,7 +12,8 @@ extern "C" {
 ============================================================================================================================*/
 #if defined    (_WIN32)
 #include <windows.h>
-#elif defined  (__APPLE__)
+//#elif defined  (__APPLE__)
+#else
 typedef uint8_t   BYTE;
 typedef uint16_t  WORD;
 typedef uint32_t  DWORD;
@@ -96,7 +97,7 @@ __ImageBIN_t*    __ImgBIN_load_bmp         (const char* __restrict__ path){
     BITMAPFILEHEADER fileHead;
     BITMAPINFOHEADER infoHead;
 
-    __ImageBIN_t* pIMG = __malloc(sizeof(__ImageBIN_t));
+    __ImageBIN_t* pIMG = RH_MALLOC(sizeof(__ImageBIN_t));
     pIMG->height  = 0;
     pIMG->width   = 0;
     pIMG->pBuffer = NULL;
@@ -119,12 +120,17 @@ __ImageBIN_t*    __ImgBIN_load_bmp         (const char* __restrict__ path){
     
     size_t page   = (__RND8(infoHead.biHeight)>>3);
     size_t col    = infoHead.biWidth;
-    pIMG->pBuffer = __calloc( page*col, sizeof(uint8_t) );
+    pIMG->pBuffer = RH_CALLOC( page*col, sizeof(uint8_t) );
+    pIMG->height  = infoHead.biHeight;
+    pIMG->width   = infoHead.biWidth;
     
-    size_t BPL  = __RND4( (infoHead.biWidth>>3)+1 ); /* Bytes Per Line */
+    size_t BPL  = __RND4( (infoHead.biWidth>>3)+((infoHead.biWidth&0x07)!=0) ); /* Bytes Per Line */
+#ifdef RH_DEBUG
+    RH_ASSERT( BPL==infoHead.biSizeImage/infoHead.biHeight );
+#endif
     fseek(bmp, fileHead.bfOffBits, SEEK_SET);
     
-    uint8_t* pTmp = __malloc( BPL );
+    uint8_t* pTmp = RH_MALLOC( BPL );
     for( int row=0; row<infoHead.biHeight; row++ ){
         fread( pTmp, sizeof(uint8_t), BPL, bmp );
         for( int col=0; col<BPL; col++ ){
@@ -139,12 +145,12 @@ __ImageBIN_t*    __ImgBIN_load_bmp         (const char* __restrict__ path){
         }
     }
     fclose(bmp);
-    __free(pTmp);
-    
+    RH_FREE(pTmp);
+
     
     // Reverse page data.
     for( int p=0; p<(page>>1); p++ ){
-        __memswap( &pIMG->pBuffer[ p*infoHead.biWidth ], &pIMG->pBuffer[ (page-p-1)*infoHead.biWidth ], infoHead.biWidth*sizeof(uint8_t) );
+        __memexch( &pIMG->pBuffer[ p*infoHead.biWidth ], &pIMG->pBuffer[ (page-p-1)*infoHead.biWidth ], infoHead.biWidth*sizeof(uint8_t) );
     }
     
     size_t dummyBit =  (page<<3) - infoHead.biHeight ;
@@ -159,29 +165,108 @@ __ImageBIN_t*    __ImgBIN_load_bmp         (const char* __restrict__ path){
             }
         }
     }
+//    for( int p=0; p<page; p++ ){
+//        for( int c=0; c<col; c++ ){
+//            printf("%02X ", pIMG->pBuffer[  p*col+c ].data);
+//        }
+//        printf("\n");
+//    }
     
-    for( int p=0; p<page; p++ ){
-        for( int c=0; c<col; c++ ){
-            printf("%02X ", pIMG->pBuffer[  p*col+c ].data);
-        }
-        printf("\n");
-    }
-    
-    return NULL;
+    return pIMG;
 }
     
 __ImageBIN_t*    __ImgBIN_create           (size_t width,size_t height){
-    __ImageBIN_t* pIMG = __malloc(sizeof(__ImageBIN_t));
+    __ImageBIN_t* pIMG = RH_MALLOC(sizeof(__ImageBIN_t));
     __exitReturn( !pIMG, NULL );
     pIMG->height          = height;
     pIMG->width           = width;
-    pIMG->pBuffer         = __calloc((__RND8(height)>>3)*(pIMG->width), sizeof(uint8_t));
+    pIMG->pBuffer         = RH_CALLOC((__RND8(height)>>3)*(pIMG->width), sizeof(uint8_t));
     
     if(pIMG->pBuffer == NULL){
-        __free(pIMG);
+        RH_FREE(pIMG);
         return NULL;
     }
     return pIMG;
+}
+    
+__ImageBIN_t*    __ImgBIN_copy             (const __ImageBIN_t* src,__ImageBIN_t* dst){
+    __exitReturn( src==NULL         ||dst==NULL          , dst );
+    __exitReturn( src->pBuffer==NULL||dst->pBuffer==NULL , dst );
+    
+    memcpy(dst->pBuffer, src->pBuffer, (__RND8(src->height)>>3)*(src->width)*sizeof(__UNION_PixelBIN_t));
+    dst->height = src->height;
+    dst->width  = src->width;
+    return dst;
+}
+    
+__ImageBIN_t*    __ImgBIN_out_bmp          (const char* __restrict__ path,__ImageBIN_t* p){
+    __exitReturn(p == NULL && p->pBuffer == NULL , NULL);
+    
+    FILE* bmp = fopen(path,"wb");
+    __exitReturn(bmp == NULL, NULL);
+    
+    size_t BPL  = __RND4( (p->width>>3)+((p->width&0x07)!=0) ); /* Bytes Per Line */
+    
+    BITMAPFILEHEADER fileHead = {
+        .bfType      = 0x4d42  ,
+        .bfSize      = 458     , //(uint32_t)((__RND8(p->height)>>3)*(p->width)*sizeof(__UNION_PixelBIN_t) + 54) ,
+        .bfReserved1 = 0       ,
+        .bfReserved2 = 0       ,
+        .bfOffBits   = 62      ,
+    };
+    
+    BITMAPINFOHEADER infoHead = {
+        .biBitCount  = 1              ,
+        .biSize      = 40             ,
+        .biWidth     = (int)p->width  ,
+        .biHeight    = (int)p->height ,
+        .biPlanes    = 1              ,
+        .biSizeImage = (DWORD)( BPL*p->height )
+    };
+    
+    const uint8_t color_plane[8] = {0x00,0x00,0x00,0x00,0xff,0xff,0xff,0x00};
+    
+    fseek(bmp,0L,SEEK_SET);
+    fwrite(&fileHead ,1 ,sizeof(BITMAPFILEHEADER) , bmp);
+    fwrite(&infoHead ,1 ,sizeof(BITMAPINFOHEADER) , bmp);
+    fseek(bmp,54L,SEEK_SET);
+    fwrite(color_plane ,1 ,8 , bmp);
+    fseek(bmp,fileHead.bfOffBits,SEEK_SET);
+    
+#ifdef RH_DEBUG
+    RH_ASSERT( BPL==infoHead.biSizeImage/infoHead.biHeight );
+#endif
+    
+    uint8_t* pTmp = RH_CALLOC( infoHead.biSizeImage, sizeof(uint8_t) );
+    
+    for( int row=0; row<p->height; row++ ){
+        for( int col=0; col<BPL; col++ ){
+            for(size_t cnt=0; cnt<8; cnt++){
+                if( (col<<3)+cnt < p->width ){
+                    pTmp[ row*BPL + col ] |= (((p->pBuffer[ (row/8)*p->width + (col<<3)+cnt ].data)>>(row%8))&0x01)<<(7-cnt);
+                }else{
+                    break;
+                }
+            }
+        }
+    }
+    
+    for( int row=0; row<(p->height>>1); row++ ){
+        __memexch(&pTmp[row*BPL], &pTmp[(p->height-row-1)*BPL], BPL);
+    }
+
+//    for( int row=0; row<p->height; row++ ){
+//        for( int c=0; c<BPL; c++ ){
+//            printf("%02X ", pTmp[  row*BPL + c ]);
+//        }
+//        printf("\n");
+//    }
+    
+    fwrite( pTmp, 1, infoHead.biSizeImage*sizeof(uint8_t), bmp );
+    
+    fclose(bmp);
+    RH_FREE(pTmp);
+    return p;
 }
 
 __ImageRGB565_t* __ImgRGB565_load_bmp      (const char* __restrict__ path){
@@ -189,7 +274,7 @@ __ImageRGB565_t* __ImgRGB565_load_bmp      (const char* __restrict__ path){
     BITMAPFILEHEADER fileHead;
     BITMAPINFOHEADER infoHead;
 
-    __ImageRGB565_t* pIMG = __malloc(sizeof(__ImageRGB565_t));
+    __ImageRGB565_t* pIMG = RH_MALLOC(sizeof(__ImageRGB565_t));
     pIMG->height  = 0;
     pIMG->width   = 0;
     pIMG->pBuffer = NULL;
@@ -212,7 +297,7 @@ __ImageRGB565_t* __ImgRGB565_load_bmp      (const char* __restrict__ path){
 
     fseek(bmp, fileHead.bfOffBits, SEEK_SET);
 
-    pIMG->pBuffer = (__UNION_PixelRGB565_t*)__malloc(infoHead.biWidth * infoHead.biHeight * sizeof(__UNION_PixelRGB565_t));
+    pIMG->pBuffer = (__UNION_PixelRGB565_t*)RH_MALLOC(infoHead.biWidth * infoHead.biHeight * sizeof(__UNION_PixelRGB565_t));
     
     for (int row = 0; row < infoHead.biHeight; row++) {
         for (int col = 0; col < infoHead.biWidth; col++) {
@@ -235,13 +320,13 @@ __ImageRGB565_t* __ImgRGB565_load_bmp      (const char* __restrict__ path){
 }
 
 __ImageRGB565_t* __ImgRGB565_create        (size_t width,size_t height){
-    __ImageRGB565_t* pIMG = __malloc(sizeof(__ImageRGB565_t));
+    __ImageRGB565_t* pIMG = RH_MALLOC(sizeof(__ImageRGB565_t));
     __exitReturn( !pIMG, NULL );
     pIMG->height          = height;
     pIMG->width           = width;
-    pIMG->pBuffer         = __calloc((pIMG->height)*(pIMG->width), sizeof(pIMG->pBuffer[0]));
+    pIMG->pBuffer         = RH_CALLOC((pIMG->height)*(pIMG->width), sizeof(pIMG->pBuffer[0]));
     if(pIMG->pBuffer == NULL){
-        __free(pIMG);
+        RH_FREE(pIMG);
         return NULL;
     }
     return pIMG;
@@ -310,7 +395,7 @@ __ImageRGB888_t* __ImgRGB888_load_bmp      (const char* __restrict__ path){
     BITMAPFILEHEADER fileHead;
     BITMAPINFOHEADER infoHead;
 
-    __ImageRGB888_t* pIMG = __malloc(sizeof(__ImageRGB888_t));
+    __ImageRGB888_t* pIMG = RH_MALLOC(sizeof(__ImageRGB888_t));
     pIMG->height  = 0;
     pIMG->width   = 0;
     pIMG->pBuffer = NULL;
@@ -331,7 +416,7 @@ __ImageRGB888_t* __ImgRGB888_load_bmp      (const char* __restrict__ path){
 
     fseek(bmp, fileHead.bfOffBits, SEEK_SET);
 
-    pIMG->pBuffer = (__UNION_PixelRGB888_t*)__malloc(infoHead.biWidth * infoHead.biHeight * sizeof(__UNION_PixelRGB888_t));
+    pIMG->pBuffer = (__UNION_PixelRGB888_t*)RH_MALLOC(infoHead.biWidth * infoHead.biHeight * sizeof(__UNION_PixelRGB888_t));
     
     for (int row = 0; row < infoHead.biHeight; row++) {
         for (int col = 0; col < infoHead.biWidth; col++) {
@@ -351,6 +436,7 @@ __ImageRGB888_t* __ImgRGB888_load_bmp      (const char* __restrict__ path){
     return pIMG;
 }
 
+#if 0
 __ImageRGB888_t* __ImgRGB888_load_png      (const char* __restrict__ path){
 #pragma pack(1)
 struct {
@@ -372,9 +458,9 @@ struct {
     
     FILE*   png;
     
-    __ImageRGB888_t* pIMG = __malloc(sizeof(__ImageRGB888_t));
+    __ImageRGB888_t* pIMG = RH_MALLOC(sizeof(__ImageRGB888_t));
 #ifdef RH_DEBUG
-    ASSERT( pIMG );
+    RH_ASSERT( pIMG );
 #endif
     pIMG->height  = 0;
     pIMG->width   = 0;
@@ -383,7 +469,7 @@ struct {
     // 打开文件
     png = fopen(path, "r");
 #ifdef RH_DEBUG
-    ASSERT( png );
+    RH_ASSERT( png );
 #endif
     fseek(png,0L,SEEK_END);
     size_t  f_size = ftell(png);
@@ -395,7 +481,7 @@ struct {
     uint8_t       pngHeadRead[8] = {0};
     for( int8_t i=0; i<8; i++ ){
         fread(&pngHeadRead[i], 1, 1, png);
-        ASSERT( pngHeadRead[i] == pngHead[i] );
+        RH_ASSERT( pngHeadRead[i] == pngHead[i] );
     }
 #endif
     
@@ -413,9 +499,9 @@ struct {
             case PNG_IHDR:  // 解析 <IHDR> Image Header
                 fread( &IHDR, sizeof(IHDR), 1, png );
 #ifdef RH_DEBUG
-                ASSERT( chunk_data_lenth == sizeof(IHDR) );
-                ASSERT( IHDR.bit_depth  == 0x08 ); //
-                ASSERT( IHDR.color_type == 0x06 || IHDR.color_type==0x02 ); // 8/16bit 真彩色
+                RH_ASSERT( chunk_data_lenth == sizeof(IHDR) );
+                RH_ASSERT( IHDR.bit_depth  == 0x08 ); //
+                RH_ASSERT( IHDR.color_type == 0x06 || IHDR.color_type==0x02 ); // 8/16bit 真彩色
 #endif
                 pIMG->width   = __SWAP_DWORD(IHDR.width);
                 pIMG->height  = __SWAP_DWORD(IHDR.height);
@@ -431,51 +517,51 @@ struct {
                 break;
                 
             case PNG_tRNS:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;
                 
             case PNG_cHRM:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
             case PNG_gAMA:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
             case PNG_iCCP:
                 //...//
                 break;    
             case PNG_sBIT:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
             case PNG_sRGB:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
 
 
             case PNG_tEXt:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
             case PNG_zEXt:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
             case PNG_iEXt:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
 
             case PNG_bKGD:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
             case PNG_hIST:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;
             case PNG_pHYs:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
             case PNG_sPLT:
-                 ASSERT(false);
+                 RH_ASSERT(false);
                 break;    
 
             case PNG_tIME:
-                 ASSERT(false);  
+                 RH_ASSERT(false);
                 break;
 
             default:
@@ -487,6 +573,7 @@ struct {
     
     return pIMG;
 }
+#endif
 
 __ImageRGB888_t* __ImgRGB888_copy          (const __ImageRGB888_t* src,__ImageRGB888_t* dst){
     __exitReturn( src==NULL         ||dst==NULL          , dst );
@@ -499,14 +586,14 @@ __ImageRGB888_t* __ImgRGB888_copy          (const __ImageRGB888_t* src,__ImageRG
 }
 
 __ImageRGB888_t* __ImgRGB888_create        (size_t width,size_t height){
-    __ImageRGB888_t* pIMG = __malloc(sizeof(__ImageRGB888_t));
+    __ImageRGB888_t* pIMG = RH_MALLOC(sizeof(__ImageRGB888_t));
     if(pIMG == NULL)
         return NULL;
     pIMG->height          = height;
     pIMG->width           = width;
-    pIMG->pBuffer         = __malloc((pIMG->height)*(pIMG->width)*sizeof(pIMG->pBuffer[0]));
+    pIMG->pBuffer         = RH_MALLOC((pIMG->height)*(pIMG->width)*sizeof(pIMG->pBuffer[0]));
     if(pIMG->pBuffer == NULL){
-        __free(pIMG);
+        RH_FREE(pIMG);
         return NULL;
     }
     memset(pIMG->pBuffer, 0, (pIMG->height)*(pIMG->width)*sizeof(pIMG->pBuffer[0]));
@@ -564,7 +651,7 @@ __ImageRGB888_t* __ImgRGB888_out_bmp       (const char* __restrict__ path,__Imag
 }
 
 __ImageRGB888_t* __ImgRGB888_free_buffer   (__ImageRGB888_t*      ptr){
-    __free(ptr->pBuffer);
+    RH_FREE(ptr->pBuffer);
     ptr->height  = 0;
     ptr->width   = 0;
     ptr->pBuffer = NULL;
@@ -572,7 +659,7 @@ __ImageRGB888_t* __ImgRGB888_free_buffer   (__ImageRGB888_t*      ptr){
 }
 
 void             __ImgRGB888_free          (__ImageRGB888_t*      ptr){
-    __free(__ImgRGB888_free_buffer(ptr));
+    RH_FREE(__ImgRGB888_free_buffer(ptr));
 }
 
 __ImageRGB888_t* __ImgRGB888_filter_gray   (const __ImageRGB888_t* src,__ImageRGB888_t* dst,uint32_t br_100){
@@ -606,7 +693,7 @@ __ImageRGB888_t* __ImgRGB888_filter_OTUS   (const __ImageRGB888_t* src,__ImageRG
     __exitReturn( dst==NULL         , NULL);
     __exitReturn( dst->pBuffer==NULL, NULL);
     __ImgRGB888_data_OTUS(src, &threshold);
-    __exitReturn(threshold == -1, NULL);
+    __exitReturn(threshold == (uint32_t)(-1), NULL);
     
     for(int y=0;y<src->height;y++){
         for(int x=0;x<src->width;x++){
@@ -631,15 +718,15 @@ __ImageRGB888_t* __ImgRGB888_trans_mirror  (const __ImageRGB888_t* src,__ImageRG
         return NULL;
     }
     if(dst == NULL){
-        dst = (__ImageRGB888_t*)__malloc(sizeof(__ImageRGB888_t));
+        dst = (__ImageRGB888_t*)RH_MALLOC(sizeof(__ImageRGB888_t));
         if(dst == NULL) // Not enough space :-(
             return dst;
-        dst->pBuffer = (__UNION_PixelRGB888_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
+        dst->pBuffer = (__UNION_PixelRGB888_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
         if(dst->pBuffer == NULL) // Not enough space :-(
             return dst;
     }
     if(dst->pBuffer == NULL){
-        dst->pBuffer = (__UNION_PixelRGB888_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
+        dst->pBuffer = (__UNION_PixelRGB888_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
         if(dst->pBuffer == NULL) // Not enough space :-(
             return dst;
     }
@@ -679,11 +766,11 @@ __ImageRGB888_t* __ImgRGB888_blur_gussian  (const __ImageRGB888_t* src,__ImageRG
     
     if( radSize_old != radSize ){
         if( gus_kernel.pBuffer != NULL ){
-            __free( gus_kernel.pBuffer );
+            RH_FREE( gus_kernel.pBuffer );
         }
         double sigma  = __map(radSize, 0, 65535, 0.0, 10.0); // convert a normal value to sigma
         size_t order  = lround(sigma*6); // 6 times sigma includes 99% area.
-        gus_kernel.pBuffer = (uint16_t*)__malloc( order*order*sizeof(uint16_t) );
+        gus_kernel.pBuffer = (uint16_t*)RH_MALLOC( order*order*sizeof(uint16_t) );
         
         if((order & 0x01) == 0) // order should be an odd number.
             order--;
@@ -706,8 +793,8 @@ __ImageRGB888_t* __ImgRGB888_blur_average  (const __ImageRGB888_t* src,__ImageRG
     __UNION_PixelRGB888_t* pSrcData = src->pBuffer;
     __UNION_PixelRGB888_t* pDstData = dst->pBuffer;
     if(pSrcData == dst->pBuffer){
-        while(1);
-        pDstData = __malloc(src->height*src->width*sizeof(__UNION_PixelRGB888_t));
+        RH_ASSERT(0);
+        pDstData = RH_MALLOC(src->height*src->width*sizeof(__UNION_PixelRGB888_t));
     }
     
     size_t order = __limit(((radSize*60)>>16), 3, 101);
@@ -715,7 +802,7 @@ __ImageRGB888_t* __ImgRGB888_blur_average  (const __ImageRGB888_t* src,__ImageRG
         order--;
     
     
-BEGIN:{
+{
     unsigned long sum_R = 0, sum_G = 0, sum_B = 0;
     unsigned long div = 0;
     
@@ -924,9 +1011,9 @@ BEGIN:{
 
 }
     if(src->pBuffer == dst->pBuffer){
-        while(1);
+        RH_ASSERT(0);
         memcpy(dst->pBuffer,pDstData,src->height*src->width*sizeof(__UNION_PixelRGB888_t));
-        __free(pDstData);
+        RH_FREE(pDstData);
     }
     return dst;
 }
@@ -942,7 +1029,7 @@ __ImageRGB888_t* __ImgRGB888_blur_fast     (const __ImageRGB888_t* src,__ImageRG
     const __UNION_PixelRGB888_t* pSrcData = src->pBuffer;
     __UNION_PixelRGB888_t*       pDstData = dst->pBuffer;
 
-    __UNION_PixelRGB888_t*       pTmpData = dst->pBuffer;//__malloc( area->width*area->height*sizeof(__UNION_PixelRGB888_t) );
+    __UNION_PixelRGB888_t*       pTmpData = dst->pBuffer;//RH_MALLOC( area->width*area->height*sizeof(__UNION_PixelRGB888_t) );
     
     
 
@@ -1055,7 +1142,7 @@ __ImageRGB888_t* __ImgRGB888_blur_fast     (const __ImageRGB888_t* src,__ImageRG
 
     }
     
-    __free( pTmpData );
+    RH_FREE( pTmpData );
     return dst;
 }
 
@@ -1067,7 +1154,7 @@ __ImageRGB888_t* __ImgRGB888_insert_NstNeighbor  (const __ImageRGB888_t* src,__I
     if(height < src->height || width < src->width) // Image of "dst" should be larger than image of "src" in both dimension.
         return NULL;
     if(dst->pBuffer == NULL){
-        dst->pBuffer = (__UNION_PixelRGB888_t*)__malloc(width*height*sizeof(__UNION_PixelRGB888_t));
+        dst->pBuffer = (__UNION_PixelRGB888_t*)RH_MALLOC(width*height*sizeof(__UNION_PixelRGB888_t));
         if(dst->pBuffer == NULL){
             return NULL;  // There is no space to malloc.
         }
@@ -1114,25 +1201,25 @@ __ImageRGB888_t* __ImgRGB888_conv2D        (const __ImageRGB888_t* src,__ImageRG
     }
     
     if(dst == NULL){
-        dst = (__ImageRGB888_t*)__malloc(sizeof(__ImageRGB888_t));
+        dst = (__ImageRGB888_t*)RH_MALLOC(sizeof(__ImageRGB888_t));
         if(dst == NULL) // Not enough space :-(
             return dst;
-        dst->pBuffer = (__UNION_PixelRGB888_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
+        dst->pBuffer = (__UNION_PixelRGB888_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
         if(dst->pBuffer == NULL) // Not enough space :-(
             return dst;
     }
     
     if(dst->pBuffer == NULL){
-        dst->pBuffer = (__UNION_PixelRGB888_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
+        dst->pBuffer = (__UNION_PixelRGB888_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
         if(dst->pBuffer == NULL) // Not enough space :-(
             return dst;
     }
     
     if(dst == NULL){
-        dst = (__ImageRGB888_t*)__malloc(sizeof(__ImageRGB888_t));
+        dst = (__ImageRGB888_t*)RH_MALLOC(sizeof(__ImageRGB888_t));
         if(dst == NULL) // Not enough space :-(
             return dst;
-        dst->pBuffer = (__UNION_PixelRGB888_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
+        dst->pBuffer = (__UNION_PixelRGB888_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB888_t));
     }
 
     for(int j=0;j<src->height;j++){
@@ -1146,7 +1233,7 @@ __ImageRGB888_t* __ImgRGB888_conv2D        (const __ImageRGB888_t* src,__ImageRG
                     size_t offset_y  = j-(k->order>>1)+n;
                     size_t offset_x  = i-(k->order>>1)+m;
                     int selectKernel = *( k->pBuffer + n       * k->order + m       );
-                    if(offset_x<0||offset_y<0||offset_x>=src->width||offset_y>=src->height){
+                    if( offset_x>=src->width || offset_y>=src->height ){
                         div -= selectKernel;
                     }else{
                         uint8_t select_R  = (src->pBuffer + offset_y*src->width + offset_x)->R;
@@ -1183,7 +1270,7 @@ __ImageRGB888_t* __ImgRGB888_conv2D        (const __ImageRGB888_t* src,__ImageRG
 }
    
 void             __ImgRGB888_data_OTUS     (const __ImageRGB888_t* src,uint32_t* threshold){
-    *threshold = -1;
+    *threshold = (uint32_t)(-1);
     __exit( src          == NULL );
     __exit( src->pBuffer == NULL );
     
@@ -1253,25 +1340,25 @@ __ImageRGB565_t* __ImgRGB565_conv2D        (const __ImageRGB565_t* src,__ImageRG
         }
             
         if(dst == NULL){
-            dst = (__ImageRGB565_t*)__malloc(sizeof(__ImageRGB565_t));
+            dst = (__ImageRGB565_t*)RH_MALLOC(sizeof(__ImageRGB565_t));
             if(dst == NULL) // Not enough space :-(
                 return dst;
-            dst->pBuffer = (__UNION_PixelRGB565_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB565_t));
+            dst->pBuffer = (__UNION_PixelRGB565_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB565_t));
             if(dst->pBuffer == NULL) // Not enough space :-(
                 return dst;
         }
         
         if(dst->pBuffer == NULL){
-            dst->pBuffer = (__UNION_PixelRGB565_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB565_t));
+            dst->pBuffer = (__UNION_PixelRGB565_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB565_t));
             if(dst->pBuffer == NULL) // Not enough space :-(
                 return dst;
         }
         
         if(dst == NULL){
-            dst = (__ImageRGB565_t*)__malloc(sizeof(__ImageRGB565_t));
+            dst = (__ImageRGB565_t*)RH_MALLOC(sizeof(__ImageRGB565_t));
             if(dst == NULL) // Not enough space :-(
                 return dst;
-            dst->pBuffer = (__UNION_PixelRGB565_t*)__malloc(src->width * src->height * sizeof(__UNION_PixelRGB565_t));
+            dst->pBuffer = (__UNION_PixelRGB565_t*)RH_MALLOC(src->width * src->height * sizeof(__UNION_PixelRGB565_t));
         }
 
         for(int j=0;j<src->height;j++){
@@ -1285,7 +1372,7 @@ __ImageRGB565_t* __ImgRGB565_conv2D        (const __ImageRGB565_t* src,__ImageRG
                         size_t offset_y  = j-(k->order>>1)+n;
                         size_t offset_x  = i-(k->order>>1)+m;
                         int selectKernel = *( k->pBuffer + n       * k->order + m       );
-                        if(offset_x<0||offset_y<0||offset_x>=src->width||offset_y>=src->height){
+                        if( offset_x>=src->width || offset_y>=src->height ){
                             div -= selectKernel;
                         }else{
                             uint8_t select_R  = (src->pBuffer + offset_y*src->width + offset_x)->R;

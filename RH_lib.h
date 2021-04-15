@@ -4,7 +4,7 @@
 #define _RH_LIB_H
 
 #include "RH_common.h"
-
+#include "RH_config.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,14 +40,27 @@ const char* __ftoa_BIN    (float     x); // ftoa_BIN
  > Memory Programming Reference
 ============================================================================================================================*/
 
-#define RH_ALLOC_CHUNK_SIZE             (614400000)
 
-extern size_t RH_alloc_byte;
-extern size_t RH_free_byte;
+
+extern size_t RH_Global_alloced_byte;
+extern size_t RH_Global_free_byte;
+void* __RH_Global_malloc ( size_t size  );
+void* __RH_Global_calloc ( size_t count  , size_t size);
+void  __RH_Global_free   ( void* ptr    );
+
+extern size_t RH_Debug_alloced_byte;
+extern size_t RH_Debug_free_byte;
+void* __RH_Debug_malloc  ( size_t size               , char* FILE, int LINE, void* (*__malloc_func)( size_t         ) );
+void* __RH_Debug_calloc  ( size_t count , size_t size, char* FILE, int LINE, void* (*__calloc_func)( size_t, size_t ) );
+void  __RH_Debug_free    ( void*  ptr                , void  (*__free_func  )(void*  )          );
+
+void* __RH_Debug_print_memory_info(void* ptr, int (*__print_func)(const char * restrict format, ...));
+void  __RH_Debug_del_cache_info(void);
+
 
 void* __memsetWORD  (void* __b, uint16_t value, size_t num);
 void* __memsetDWORD (void* __b, uint32_t value, size_t num);
-void* __memswap     (void* __a, void* __b, size_t size );
+void* __memexch     (void* __a, void* __b, size_t size );
 
 void* __memset_Area (void*                __b,int                      value,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye);
 void* __memcpy_Area (void* __restrict__ __dst,const void* __restrict__ __src,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye);

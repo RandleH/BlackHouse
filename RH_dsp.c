@@ -14,7 +14,7 @@ void __rDFT_Float(const float* src,float_t* dst_m,float complex* dst_c,size_t df
     if( (dst_m == NULL && dst_c == NULL) || src == NULL)
         return;
     if( X == NULL ){
-        X = (float complex*)__malloc(dftLen*sizeof(float complex));
+        X = (float complex*)RH_MALLOC(dftLen*sizeof(float complex));
         if( X == NULL ){
             return;
         }
@@ -39,7 +39,7 @@ void __rDFT_Float(const float* src,float_t* dst_m,float complex* dst_c,size_t df
 //    for(size_t k=0;k<dftLen;k++) printf("| %f + \tj*%f | = \t%f\n",creal(X[k]),cimag(X[k]),dst_m[k]);
     
     if(dst_c == NULL)
-        __free(X);
+        RH_FREE(X);
     
 }
 
@@ -51,7 +51,7 @@ void __cFFT_Float(const float complex* src,float_t* dst_m,float complex* dst_c,s
         return;
     
     if( _x == NULL ){
-        _x = (float complex*)__malloc(fftLen*sizeof(float complex));
+        _x = (float complex*)RH_MALLOC(fftLen*sizeof(float complex));
         if( _x == NULL ){
             return;
         }
@@ -86,7 +86,7 @@ void __cFFT_Float(const float complex* src,float_t* dst_m,float complex* dst_c,s
     }
     
     if(dst_c == NULL)
-        __free(_x);
+        RH_FREE(_x);
     
 }
 
@@ -96,7 +96,7 @@ void __cDFT_Float(const float complex* src,float_t* dst_m,float complex* dst_c,s
     if( (dst_m == NULL && dst_c == NULL) || src == NULL)
         return;
     if( X == NULL ){
-        X = (float complex*)__malloc(dftLen*sizeof(float complex));
+        X = (float complex*)RH_MALLOC(dftLen*sizeof(float complex));
         if( X == NULL ){
             return;
         }
@@ -116,7 +116,7 @@ void __cDFT_Float(const float complex* src,float_t* dst_m,float complex* dst_c,s
     // for(size_t k=0;k<dftLen;k++) printf("| %.4f + j* %.4f | = \t%f\n",creal(X[k]),cimag(X[k]),dst_m[k]);
     
     if(dst_c == NULL)
-        __free(X);
+        RH_FREE(X);
 }
 
 void __rIDFT_Float(const float* src,float_t* dst_m,float complex* dst_c,size_t dftLen){
@@ -131,7 +131,7 @@ void __cIDFT_Float(const float complex* src,float_t* dst_m,float complex* dst_c,
     if( (dst_m == NULL&& dst_c == NULL) || src == NULL )
         return;
     if( _x == NULL ){
-        _x = (float complex*)__malloc(dftLen*sizeof(float complex));
+        _x = (float complex*)RH_MALLOC(dftLen*sizeof(float complex));
     }
     memset(_x,0,dftLen*sizeof(float complex));
     
@@ -151,7 +151,7 @@ void __cIDFT_Float(const float complex* src,float_t* dst_m,float complex* dst_c,
     // for(size_t k=0;k<dftLen;k++) printf("| %.4f + \tj*%.4f | = \t%.4f\n",creal(_x[k]),cimag(_x[k]),dst_m[k]);
     
     if(dst_c == NULL)
-        __free(_x);
+        RH_FREE(_x);
 }
 
 void __Huffman_Code(const int* __src,int* __dst,size_t len){

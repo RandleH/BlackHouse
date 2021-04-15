@@ -69,7 +69,7 @@ const char*       __ftoa_BIN     (float    x){
     static char pTmp[(sizeof(float)<<3)+1] = {0};
     char* pTmp_iter = pTmp;
     
-    void* pNum = ((uint8_t*)(&x))+sizeof(float) - 1;
+    uint8_t* pNum = ((uint8_t*)(&x))+sizeof(float) - 1;
     
     memset( pTmp , '\0' ,  (sizeof(float)<<3)+1 );
     size_t size = sizeof(float);
@@ -121,7 +121,7 @@ const char*       __ldtoa_BIN    (uint32_t x){
     static char pTmp[(sizeof(uint32_t)<<3)+1] = {0};
     char* pTmp_iter = pTmp;
     
-    void* pNum = ((uint8_t*)(&x))+sizeof(uint32_t) - 1;
+    uint8_t* pNum = ((uint8_t*)(&x))+sizeof(uint32_t) - 1;
     
     memset( pTmp , '\0' ,  (sizeof(uint32_t)<<3)+1 );
     size_t size = sizeof(uint32_t);
@@ -140,14 +140,70 @@ const char*       __ldtoa_BIN    (uint32_t x){
 /*===========================================================================================================================
  > Memory Programming Reference
 ============================================================================================================================*/
+
+#if   ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__NONE )
+#define RH_ALLOC_CHUNK_SIZE   (1)
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__64B )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__64B
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__128B )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__128B
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__256B )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__256B
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__512B )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__512B
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__1KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__1KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__2KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__2KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__4KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__4KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__8KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__8KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__16KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__16KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__32KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__32KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__64KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__64KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__128KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__128KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__256KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__256KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__512KB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__512KB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__1MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__1MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__2MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__2MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__4MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__4MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__8MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__8MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__16MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__16MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__32MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__32MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__64MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__64MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__128MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__128MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__256MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__256MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__512MB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__512MB
+#elif ( RH_CFG_MALLOC_SIZE == RH_CFG_MALLOC_SIZE__1GB )
+#define RH_ALLOC_CHUNK_SIZE   RH_CFG_MALLOC_SIZE__1GB
+#else
+#error "Unknown size for allocating memory. "
+#endif
+    
 #ifndef M_ADR_OFFSET
 #define M_ADR_OFFSET( ptr1 , ptr2 )   (size_t)((__abs(ptr2 - ptr1)) - 1)
 #endif
          
 #pragma pack(1)
 unsigned char __VERTUAL_HEAP[ RH_ALLOC_CHUNK_SIZE ];//__attribute__((at()));
-size_t RH_alloc_byte  = 0;
-size_t RH_free_byte   = 0;
+
 
 struct __MallocNode_t{
     unsigned long            index;
@@ -168,13 +224,15 @@ struct __MallocNode_t{
      * index=0                                                                   index=32768
      *
      --------------------------------------------------------------------------------------------------------*/
-
-void* __RH_malloc(size_t size){
+    
+size_t RH_Global_alloced_byte  = 0;
+size_t RH_Global_free_byte   = 0;
+void* __RH_Global_malloc(size_t size){
     size_t size_need       = size;
-    if( RH_alloc_byte + size_need > RH_ALLOC_CHUNK_SIZE )
+    if( RH_Global_alloced_byte + size_need > RH_ALLOC_CHUNK_SIZE )
         return NULL;
     else{
-        RH_alloc_byte += size_need;
+        RH_Global_alloced_byte += size_need;
         // It doesn't mean there is enough space to allocate.
     }
     
@@ -186,10 +244,6 @@ void* __RH_malloc(size_t size){
     
     pNewNode->byte      = size_need;
     pNewNode->pNextNode = NULL;
-    
-// Only for test.
-//    for(int i=0;i<RH_ALLOC_CHUNK_SIZE;i++)
-//        __VERTUAL_HEAP[i] = i;
     
     // Special Condition. There isn't any allocated memory.
     if(pNode == NULL){
@@ -230,24 +284,119 @@ void* __RH_malloc(size_t size){
     }else{
         // Fail to find enough space to allocate
         free(pNewNode);
-        RH_alloc_byte -= size_need;
+        RH_Global_alloced_byte -= size_need;
     }
+    RH_Global_free_byte = RH_ALLOC_CHUNK_SIZE - RH_Global_alloced_byte;
     return ptr;
 }
 
-void* __RH_calloc(size_t count, size_t size){
+void* __RH_Global_calloc(size_t count, size_t size){
     size_t  byt = count*size;
-    void*   ptr = __RH_malloc(byt);
+    void*   ptr = __RH_Global_malloc(byt);
 #ifdef RH_DEBUG
-    ASSERT( ptr );
+    RH_ASSERT( ptr );
 #else
     __exitReturn(ptr==NULL, ptr);
 #endif
     
     return memset( ptr, 0, byt );
 }
+
     
-void __RH_free(void* ptr){
+
+    
+    
+#include "RH_data.h"
+size_t RH_Debug_alloced_byte = 0;
+size_t RH_Debug_free_byte    = 0;
+static __HashMap_t* pHEAD_HASHMAP_size_2_ptr = NULL;
+    
+struct __RH_DebugMemoryInfo_t{
+    size_t      byte;
+    const char* FILE;
+    uint32_t    LINE;
+    void*       ptr;
+};
+    
+void* __RH_Debug_malloc( size_t size, char* FILE, int LINE, void* (*__malloc_func)(size_t size) ){
+    if( !pHEAD_HASHMAP_size_2_ptr )
+        pHEAD_HASHMAP_size_2_ptr = __Hash_createMap();
+//    size_t* pSize = malloc(sizeof(size_t));
+//    *pSize = size;
+    
+    struct __RH_DebugMemoryInfo_t* pInfo = malloc(sizeof(struct __RH_DebugMemoryInfo_t));
+    
+    void* ptr = (*__malloc_func)(size);
+#ifdef RH_DEBUG
+    RH_ASSERT( ptr );
+    RH_ASSERT( pInfo );
+#endif
+    pInfo->ptr  = ptr;
+    pInfo->FILE = FILE;
+    pInfo->LINE = LINE;
+    pInfo->byte = size;
+    
+    RH_Debug_alloced_byte += pInfo->byte;
+    __Hash_pair(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr, pInfo);
+    
+    return ptr;
+}
+
+void* __RH_Debug_calloc( size_t count, size_t size, char* FILE, int LINE, void* (*__calloc_func)( size_t, size_t ) ){
+    
+    if( !pHEAD_HASHMAP_size_2_ptr )
+        pHEAD_HASHMAP_size_2_ptr = __Hash_createMap();
+    
+    struct __RH_DebugMemoryInfo_t* pInfo = malloc(sizeof(struct __RH_DebugMemoryInfo_t));
+    void* ptr = (*__calloc_func)( count,size );
+#ifdef RH_DEBUG
+    RH_ASSERT( ptr );
+    RH_ASSERT( pInfo );
+#endif
+    
+    pInfo->ptr  = ptr;
+    pInfo->FILE = FILE;
+    pInfo->LINE = LINE;
+    pInfo->byte = count*size;
+    
+    RH_Debug_alloced_byte += pInfo->byte;
+    __Hash_pair(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr, pInfo);
+    
+    return ptr;
+}
+
+void __RH_Debug_free(void* ptr, void (*__free_func)(void*)){
+    struct __RH_DebugMemoryInfo_t* pInfo = (struct __RH_DebugMemoryInfo_t*)__Hash_get(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr);
+    RH_Debug_alloced_byte -= pInfo->byte;
+         
+    (*__free_func)(ptr);
+
+}
+    
+void* __RH_Debug_print_memory_info(void* ptr, int (*__print_func)(const char * restrict format, ...)){
+    __exitReturn( __print_func==NULL, ptr);
+    
+    struct __RH_DebugMemoryInfo_t* pInfo = (struct __RH_DebugMemoryInfo_t*)__Hash_get(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr);
+#ifdef RH_DEBUG
+    RH_ASSERT( pInfo->ptr==ptr );
+#endif
+    size_t len = strlen("$DEBUG_MEM_INFO: [] [Ln ] [: byte]\n")+strlen(pInfo->FILE)+((sizeof(pInfo->LINE)+sizeof(pInfo->byte))<<3);
+    char*  str = alloca( len + sizeof('\0') );
+    
+    snprintf(str, len, "$DEBUG_MEM_INFO: [%s] [Ln %d] [%zu:%zu Byte]\n",pInfo->FILE,pInfo->LINE,pInfo->byte,RH_Debug_alloced_byte);
+    
+    (*__print_func)("%s",str);
+    
+    return ptr;
+}
+    
+void __RH_Debug_del_memory_info(void){
+    __Hash_removeAll(pHEAD_HASHMAP_size_2_ptr);
+    pHEAD_HASHMAP_size_2_ptr = NULL;
+    RH_Debug_alloced_byte    = 0;
+}
+    
+void __RH_Global_free(void* ptr){
     unsigned long index = (unsigned long)((unsigned char*)ptr - __VERTUAL_HEAP);
     struct __MallocNode_t* pNode     = pHeapMemoryHeadNode;
     struct __MallocNode_t* pForeward = NULL;
@@ -255,7 +404,7 @@ void __RH_free(void* ptr){
         if(pNode->index == index && pNode->ptr == ptr){
             if(pForeward != NULL){
                 pForeward->pNextNode = pNode->pNextNode;
-                RH_alloc_byte -= pNode->byte;
+                RH_Global_alloced_byte -= pNode->byte;
                 free(pNode);
             }
             break;
@@ -263,13 +412,17 @@ void __RH_free(void* ptr){
         pForeward = pNode;
         pNode     = pNode->pNextNode;
     }
+    RH_Global_free_byte = RH_ALLOC_CHUNK_SIZE - RH_Global_alloced_byte;
 }
 
 void* __memsetWORD(void* __b,uint16_t value,size_t num){
     uint16_t* src = (uint16_t*)__b;
+#if !defined( __CC_ARM )
     if( sizeof(wchar_t) == sizeof(uint16_t) ){
         wmemset((wchar_t*)src, value, num);
-    }else{
+    }else
+#endif
+    {
         size_t remain = num;
         (*((uint16_t*)src)) = value;
         remain--;
@@ -288,9 +441,12 @@ void* __memsetWORD(void* __b,uint16_t value,size_t num){
 
 void* __memsetDWORD(void* __b,uint32_t value,size_t num){
     uint32_t* src = (uint32_t*)__b;
+#if !defined( __CC_ARM )
     if( sizeof(wchar_t) == sizeof(uint32_t) ){
         wmemset((wchar_t*)src, (int)value, num);
-    }else{
+    }else
+#endif
+    {
         size_t remain = num;
         (*((uint32_t*)src)) = (uint32_t)value;
         remain--;
@@ -307,7 +463,7 @@ void* __memsetDWORD(void* __b,uint32_t value,size_t num){
     return __b;
 }
     
-void* __memswap     (void* __a, void* __b, size_t size ){
+void* __memexch     (void* __a, void* __b, size_t size ){
     uint8_t* a = __a;
     uint8_t* b = __b;
     while(size--){
@@ -327,7 +483,7 @@ void* __memset_Area(void* __b,int value,size_t size,size_t nmenb_line,long xs,lo
     
     for(size_t y = ys;y <= ye;y++){
         size_t offset = size*(nmenb_line*y + xs);
-        memset( (__b + offset) , value, num_objs );
+        memset( ((char*)__b + offset) , value, num_objs );
     }
     
     return __b;
@@ -342,7 +498,7 @@ void* __memcpy_Area(void* __restrict__ __dst,const void* __restrict__ __src,size
 
     for(size_t y = ys;y <= ye;y++){
         size_t offset = size*(nmenb_line*y + xs);
-        memcpy( (__dst + offset) , (__src + offset), num_objs );
+        memcpy( ((char*)__dst + offset) , ((char*)__src + offset), num_objs );
     }
 
     return __dst;
@@ -356,7 +512,7 @@ void* __memgrab_Area(void* __restrict__ __dst,const void* __restrict__ __src,siz
     char* p = __dst;
     for(size_t y = ys;y <= ye;y++){
         size_t offset = size*(nmenb_line*y + xs);
-        memmove( p , (__src+offset), num_objs );
+        memmove( p , ((char*)__src+offset), num_objs );
         p += num_objs;
     }
     
