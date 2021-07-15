@@ -1,5 +1,5 @@
 
-#include "RH_lib.h"
+#include "BLK_lib.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,62 +10,63 @@ extern "C" {
 #define M_SWAP_16BIT(x)   ((M_SWAP_8BIT((x)&0x00ff)<<8)|(M_SWAP_8BIT(((x)&0xff00)>>8)))
 #define M_SWAP_32BIT(x)   ((M_SWAP_16BIT((x)&0x0000ffff)<<16)|(M_SWAP_16BIT(((x)&0xffff0000)>>16)))
      
-inline uint8_t    __swap_8BIT    (uint8_t  x){
+inline uint8_t    BLK_FUNC( Bit, swap8  )   (uint8_t  x){
     return (uint8_t)M_SWAP_8BIT((x&0xff));
 }
      
-inline uint16_t   __swap_16BIT   (uint16_t x){
+inline uint16_t   BLK_FUNC( Bit, swap16 )   (uint16_t x){
     return (uint16_t)M_SWAP_16BIT((x&0xffff));
 }
      
-inline uint32_t   __swap_32BIT   (uint32_t x){
+inline uint32_t   BLK_FUNC( Bit, swap32 )   (uint32_t x){
     return (uint32_t)M_SWAP_32BIT((x&0xffffffff));
 }
      
-inline uint32_t   __swap_nBIT    (uint32_t x,size_t n){
+inline uint32_t   BLK_FUNC( Bit, swapN  )   (uint32_t x,size_t n){
     return (uint32_t)( M_SWAP_32BIT(x)>>(32-n) );
 }
 
-inline uint32_t   __swap_DATA    (uint32_t x){
+inline uint32_t   BLK_FUNC( Bit, swap   )   (uint32_t x){
     int dummy = 32;
     while((--dummy)&&((1<<dummy)&(x&0xffffffff))==0);
     
     return (uint32_t)( M_SWAP_32BIT(x)>>(32-(dummy+1)) );
 }
      
-inline size_t     __sizeof_BINs  (uint32_t x){
+inline size_t     BLK_FUNC( Bit, BINs )  (uint32_t x){
     size_t cnt = 1;
     while(x>>=1){cnt++;}
     return cnt;
 }
      
-inline size_t     __sizeof_OCTs  (uint32_t x){
+inline size_t     BLK_FUNC( Bit, OCTs )  (uint32_t x){
     size_t cnt = 1;
     while(x>>=3){cnt++;}
     return cnt;
 }
 
-inline size_t     __sizeof_DECs  (uint32_t x){
+inline size_t     BLK_FUNC( Bit, DECs )  (uint32_t x){
     size_t cnt = 1;
     while(x/=10){cnt++;}
     return cnt;
 }
 
-inline size_t     __sizeof_HEXs  (uint32_t x){
+inline size_t     BLK_FUNC( Bit, HEXs )  (uint32_t x){
     size_t cnt = 1;
     while(x>>=4){cnt++;}
     return cnt;
 }
       
-inline uint32_t   __Gray2Bin     (uint32_t x){
+inline uint32_t   BLK_FUNC( Bit, gray2bin )     (uint32_t x){
+    RH_ASSERT(0);
     return (uint32_t)((x>>1)^x);
 }
       
-inline uint32_t   __Bin2Gray     (uint32_t x){
+inline uint32_t   BLK_FUNC( Bit, bin2gray )     (uint32_t x){
     return (uint32_t)((x>>1)^x);
 }
     
-const char*       __ftoa_BIN     (float    x){
+const char*       BLK_FUNC( Bin, ftoa )     (float    x){
     static char pTmp[(sizeof(float)<<3)+1] = {0};
     char* pTmp_iter = pTmp;
     
@@ -85,7 +86,7 @@ const char*       __ftoa_BIN     (float    x){
     return pTmp;
 }
     
-const char*       __btoa_BIN     (uint8_t  x){
+const char*       BLK_FUNC( Bin, itoa )     (uint8_t  x){
     static char pTmp[(sizeof(uint8_t)<<3)+1] = {0};
     
     memset( pTmp , '\0' ,  (sizeof(uint8_t)<<3)+1 );
@@ -117,7 +118,7 @@ const char*       __btoa_BIN     (uint8_t  x){
     return pTmp;
 }
 
-const char*       __ldtoa_BIN    (uint32_t x){
+const char*       BLK_FUNC( Bin, ltoa )    (uint32_t x){
     static char pTmp[(sizeof(uint32_t)<<3)+1] = {0};
     char* pTmp_iter = pTmp;
     
@@ -136,6 +137,122 @@ const char*       __ldtoa_BIN    (uint32_t x){
     }
     return pTmp;
 }
+    
+/*===========================================================================================================================
+ > Sort Programming Reference
+============================================================================================================================*/
+
+#if 0    
+typedef int32_t var;
+static int __compar( const void* p1, const void* p2 ){
+
+   printf("%d,%d\n", *(var*)p1, *(var*)p2);
+   if( *(var*)p2 > *(var*)p1 ){
+       return 1;
+   }else if( *(var*)p2 < *(var*)p1 ){
+       return -1;
+   }
+   return 0;
+}
+#endif
+    
+int BLK_FUNC( Sort, insert ) (void *base, size_t nel, size_t width, int (*compar)(const void *, const void *)){
+    __exitReturn(nel==0||nel==1, 0);
+    
+    uint8_t* ptr_iter = ((uint8_t*)base);
+    for( long i=1; i<nel; i++, ptr_iter+=width ){
+        uint8_t* ptr_tar = alloca(width);  
+        uint8_t* ptr_tmp = ptr_iter;
+        
+        memmove(ptr_tar, (ptr_iter+width), width);
+        for (long j=i-1; j>=0; --j, ptr_tmp-=width){
+            if( (*compar)( ptr_tmp, ptr_tar )>=0 ){        // compare base[j] & base[i]
+                memmove( ptr_tmp+width, ptr_tmp, width );
+                continue;
+            }
+            break;
+        }
+        memmove( ptr_tmp+width, ptr_tar, width );
+    }
+    
+    return 0;
+}
+    
+int BLK_FUNC( Sort, shell  ) (void *base, size_t nel, size_t width, int (*compar)(const void *, const void *)){
+    size_t inc = nel-1; // 希尔增量
+    
+    inc |= inc>>1;
+    inc |= inc>>2;
+    inc |= inc>>4;
+    inc |= inc>>8;
+    inc |= inc>>16;
+    
+    while( inc>1 ){
+        inc = ((inc+1)>>1)-1;                             // 希尔增量递推关系式子(自行设定) 此处为 a[n] = 2^n - 1
+        // 以下为对步长为 inc 所得到的子数组进行插入排序
+        size_t   step     = inc*width;                    // 字节步长 = 单个元素字节数 x 数组步长
+        uint8_t* ptr_iter = ((uint8_t*)base);             // 子数组首地址
+        for( long i=inc; i<nel; i++, ptr_iter+=width ){
+            uint8_t* ptr_tar = alloca(width);
+            uint8_t* ptr_tmp = ptr_iter;
+            memmove(ptr_tar, ptr_iter+step, width);       // 临时存放选中的元素值
+            
+            for (long j=i-inc; j>=0; j-=inc, ptr_tmp-=step){
+                if( (*compar)( ptr_tmp, ptr_tar )>=0 ){        // compare base[j] & base[i]
+                    memmove( ptr_tmp+step, ptr_tmp, width );
+                    continue;
+                }
+                break;
+            }
+            memmove( ptr_tmp+step, ptr_tar, width );
+        }
+    }
+    
+    return 0;
+}
+    
+int BLK_FUNC( Sort, quick  ) (void *base, size_t nel, size_t width, int (*compar)(const void *, const void *)){
+    qsort( base, nel, width, compar );
+    return 0;
+}
+
+/*===========================================================================================================================
+ > Quantity Reference
+============================================================================================================================*/
+void BLK_FUNC( Array, max )(const int* array, size_t size, int* RH_NULLABLE returnVAL, size_t* RH_NULLABLE returnIDX){
+    __exit( !array );
+
+    int    VAL = *array;
+    size_t IDX = 0;
+    while(size--){
+        if(*array > VAL)
+            VAL = *array;
+        array++;
+        IDX++;
+    }
+
+    if( returnVAL ) (*returnVAL) = VAL;
+    if( returnIDX ) (*returnIDX) = IDX;
+
+}
+
+void BLK_FUNC( Array, min )(const int* array, size_t size, int* RH_NULLABLE returnVAL, size_t* RH_NULLABLE returnIDX){
+    __exit( !array );
+
+    int    VAL = *array;
+    size_t IDX = 0;
+    while(size--){
+        if(*array < VAL)
+            VAL = *array;
+        array++;
+        IDX++;
+    }
+
+    if( returnVAL ) (*returnVAL) = VAL;
+    if( returnIDX ) (*returnIDX) = IDX;
+
+}
+
 
 /*===========================================================================================================================
  > Memory Programming Reference
@@ -225,14 +342,15 @@ struct __MallocNode_t{
      *
      --------------------------------------------------------------------------------------------------------*/
     
-size_t RH_Global_alloced_byte  = 0;
-size_t RH_Global_free_byte   = 0;
-void* __RH_Global_malloc(size_t size){
+size_t BLK_GVAR( memoryAllocated )  = 0;
+size_t BLK_GVAR( memoryFree      )  = RH_ALLOC_CHUNK_SIZE;
+    
+void* BLK_FUNC( Memory, malloc ) (size_t size){
     size_t size_need       = size;
-    if( RH_Global_alloced_byte + size_need > RH_ALLOC_CHUNK_SIZE )
+    if( BLK_GVAR( memoryAllocated ) + size_need > RH_ALLOC_CHUNK_SIZE )
         return NULL;
     else{
-        RH_Global_alloced_byte += size_need;
+        BLK_GVAR( memoryAllocated ) += size_need;
         // It doesn't mean there is enough space to allocate.
     }
     
@@ -249,7 +367,8 @@ void* __RH_Global_malloc(size_t size){
     if(pNode == NULL){
         pHeapMemoryHeadNode = pNewNode;
         pNewNode->index     = 0;
-        ptr                 = &__VERTUAL_HEAP[pNewNode->index];
+        pNewNode->ptr       = ptr = &__VERTUAL_HEAP[pNewNode->index];
+        BLK_GVAR( memoryFree ) -= size_need;
         return ptr;
     }
     
@@ -284,15 +403,15 @@ void* __RH_Global_malloc(size_t size){
     }else{
         // Fail to find enough space to allocate
         free(pNewNode);
-        RH_Global_alloced_byte -= size_need;
+        BLK_GVAR( memoryAllocated ) -= size_need;
     }
-    RH_Global_free_byte = RH_ALLOC_CHUNK_SIZE - RH_Global_alloced_byte;
+    BLK_GVAR( memoryFree ) = RH_ALLOC_CHUNK_SIZE - BLK_GVAR( memoryAllocated );
     return ptr;
 }
 
-void* __RH_Global_calloc(size_t count, size_t size){
+void* BLK_FUNC( Memory, calloc ) (size_t count, size_t size){
     size_t  byt = count*size;
-    void*   ptr = __RH_Global_malloc(byt);
+    void*   ptr = BLK_FUNC( Memory, malloc )(byt);
 #ifdef RH_DEBUG
     RH_ASSERT( ptr );
 #else
@@ -302,14 +421,40 @@ void* __RH_Global_calloc(size_t count, size_t size){
     return memset( ptr, 0, byt );
 }
 
-    
+void  BLK_FUNC( Memory, free   ) (void* ptr){
+    unsigned long index = (unsigned long)((unsigned char*)ptr - __VERTUAL_HEAP);
+    struct __MallocNode_t* pNode     = pHeapMemoryHeadNode;
+    struct __MallocNode_t* pForeward = NULL;
+    while(pNode != NULL){
+        if(pNode->index == index && pNode->ptr == ptr){
+            if(pForeward != NULL){
+                pForeward->pNextNode = pNode->pNextNode;
+                BLK_GVAR( memoryAllocated ) -= pNode->byte;
+                free(pNode);
+            }else{
+                // 前节点为空只可能pNode为pHeapMemoryHeadNode
+            #ifdef RH_DEBUG
+                RH_ASSERT( pNode == pHeapMemoryHeadNode );
+                RH_ASSERT( pNode->ptr == __VERTUAL_HEAP );
+            #endif
+                BLK_GVAR( memoryAllocated ) -= pNode->byte;
+                pHeapMemoryHeadNode = NULL;
+                free(pNode);
+            }
+            break;
+        }
+        pForeward = pNode;
+        pNode     = pNode->pNextNode;
+    }
+    BLK_GVAR( memoryFree ) = RH_ALLOC_CHUNK_SIZE - BLK_GVAR( memoryAllocated );
+}    
 
     
     
-#include "RH_data.h"
-size_t RH_Debug_alloced_byte = 0;
-size_t RH_Debug_free_byte    = 0;
-static __HashMap_t* pHEAD_HASHMAP_size_2_ptr = NULL;
+#include "BLK_data.h"
+size_t BLK_GVAR( debug_memoryAllocated ) = 0;
+size_t BLK_GVAR( debug_memoryFree      ) = 0;
+static BLK_SRCT(HashMap)* pHEAD_HASHMAP_size_2_ptr = NULL;
     
 struct __RH_DebugMemoryInfo_t{
     size_t      byte;
@@ -318,9 +463,9 @@ struct __RH_DebugMemoryInfo_t{
     void*       ptr;
 };
     
-void* __RH_Debug_malloc( size_t size, char* FILE, int LINE, void* (*__malloc_func)(size_t size) ){
+void* BLK_FUNC( Memory, debug_malloc   )( size_t size, char* FILE, int LINE, void* (*__malloc_func)(size_t size) ){
     if( !pHEAD_HASHMAP_size_2_ptr )
-        pHEAD_HASHMAP_size_2_ptr = __Hash_createMap();
+        pHEAD_HASHMAP_size_2_ptr = BLK_FUNC(Hash, createMap)();
 //    size_t* pSize = malloc(sizeof(size_t));
 //    *pSize = size;
     
@@ -336,16 +481,16 @@ void* __RH_Debug_malloc( size_t size, char* FILE, int LINE, void* (*__malloc_fun
     pInfo->LINE = LINE;
     pInfo->byte = size;
     
-    RH_Debug_alloced_byte += pInfo->byte;
-    __Hash_pair(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr, pInfo);
+    BLK_GVAR( debug_memoryAllocated ) += pInfo->byte;
+    BLK_FUNC(Hash, pair)(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr, pInfo);
     
     return ptr;
 }
 
-void* __RH_Debug_calloc( size_t count, size_t size, char* FILE, int LINE, void* (*__calloc_func)( size_t, size_t ) ){
+void* BLK_FUNC( Memory, debug_calloc   )( size_t count, size_t size, char* FILE, int LINE, void* (*__calloc_func)( size_t, size_t ) ){
     
     if( !pHEAD_HASHMAP_size_2_ptr )
-        pHEAD_HASHMAP_size_2_ptr = __Hash_createMap();
+        pHEAD_HASHMAP_size_2_ptr = BLK_FUNC(Hash, createMap)();
     
     struct __RH_DebugMemoryInfo_t* pInfo = malloc(sizeof(struct __RH_DebugMemoryInfo_t));
     void* ptr = (*__calloc_func)( count,size );
@@ -359,63 +504,44 @@ void* __RH_Debug_calloc( size_t count, size_t size, char* FILE, int LINE, void* 
     pInfo->LINE = LINE;
     pInfo->byte = count*size;
     
-    RH_Debug_alloced_byte += pInfo->byte;
-    __Hash_pair(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr, pInfo);
+    BLK_GVAR( debug_memoryAllocated ) += pInfo->byte;
+    BLK_FUNC(Hash, pair)(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr, pInfo);
     
     return ptr;
 }
 
-void __RH_Debug_free(void* ptr, void (*__free_func)(void*)){
-    struct __RH_DebugMemoryInfo_t* pInfo = (struct __RH_DebugMemoryInfo_t*)__Hash_get(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr);
-    RH_Debug_alloced_byte -= pInfo->byte;
+void  BLK_FUNC( Memory, debug_free     )( void* ptr, void (*__free_func)(void*)){
+    struct __RH_DebugMemoryInfo_t* pInfo = (struct __RH_DebugMemoryInfo_t*)BLK_FUNC(Hash, get)(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr);
+    BLK_GVAR( debug_memoryAllocated ) -= pInfo->byte;
          
     (*__free_func)(ptr);
 
 }
     
-void* __RH_Debug_print_memory_info(void* ptr, int (*__print_func)(const char * restrict format, ...)){
+void* BLK_FUNC( Memory, debug_print    )( void* ptr, int (*__print_func)(const char * restrict format, ...)){
     __exitReturn( __print_func==NULL, ptr);
     
-    struct __RH_DebugMemoryInfo_t* pInfo = (struct __RH_DebugMemoryInfo_t*)__Hash_get(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr);
+    struct __RH_DebugMemoryInfo_t* pInfo = (struct __RH_DebugMemoryInfo_t*)BLK_FUNC(Hash, get)(pHEAD_HASHMAP_size_2_ptr, (size_t)ptr);
 #ifdef RH_DEBUG
     RH_ASSERT( pInfo->ptr==ptr );
 #endif
     size_t len = strlen("$DEBUG_MEM_INFO: [] [Ln ] [: byte]\n")+strlen(pInfo->FILE)+((sizeof(pInfo->LINE)+sizeof(pInfo->byte))<<3);
     char*  str = alloca( len + sizeof('\0') );
     
-    snprintf(str, len, "$DEBUG_MEM_INFO: [%s] [Ln %d] [%zu:%zu Byte]\n",pInfo->FILE,pInfo->LINE,pInfo->byte,RH_Debug_alloced_byte);
+    snprintf(str, len, "$DEBUG_MEM_INFO: [%s] [Ln %d] [%zu:%zu Byte]\n",pInfo->FILE,pInfo->LINE,pInfo->byte,BLK_GVAR( debug_memoryAllocated ));
     
     (*__print_func)("%s",str);
     
     return ptr;
 }
     
-void __RH_Debug_del_memory_info(void){
-    __Hash_removeAll(pHEAD_HASHMAP_size_2_ptr);
+void  BLK_FUNC( Memory, debug_delCache )( void ){
+    BLK_FUNC(Hash, removeAll)(pHEAD_HASHMAP_size_2_ptr);
     pHEAD_HASHMAP_size_2_ptr = NULL;
-    RH_Debug_alloced_byte    = 0;
-}
-    
-void __RH_Global_free(void* ptr){
-    unsigned long index = (unsigned long)((unsigned char*)ptr - __VERTUAL_HEAP);
-    struct __MallocNode_t* pNode     = pHeapMemoryHeadNode;
-    struct __MallocNode_t* pForeward = NULL;
-    while(pNode != NULL){
-        if(pNode->index == index && pNode->ptr == ptr){
-            if(pForeward != NULL){
-                pForeward->pNextNode = pNode->pNextNode;
-                RH_Global_alloced_byte -= pNode->byte;
-                free(pNode);
-            }
-            break;
-        }
-        pForeward = pNode;
-        pNode     = pNode->pNextNode;
-    }
-    RH_Global_free_byte = RH_ALLOC_CHUNK_SIZE - RH_Global_alloced_byte;
+    BLK_GVAR( debug_memoryAllocated )    = 0;
 }
 
-void* __memsetWORD(void* __b,uint16_t value,size_t num){
+void* BLK_FUNC( Memory, setWord        )(void* __b,uint16_t value,size_t num){
     uint16_t* src = (uint16_t*)__b;
 #if !defined( __CC_ARM )
     if( sizeof(wchar_t) == sizeof(uint16_t) ){
@@ -439,7 +565,7 @@ void* __memsetWORD(void* __b,uint16_t value,size_t num){
     return __b;
 }
 
-void* __memsetDWORD(void* __b,uint32_t value,size_t num){
+void* BLK_FUNC( Memory, setDWord       )(void* __b,uint32_t value,size_t num){
     uint32_t* src = (uint32_t*)__b;
 #if !defined( __CC_ARM )
     if( sizeof(wchar_t) == sizeof(uint32_t) ){
@@ -463,7 +589,7 @@ void* __memsetDWORD(void* __b,uint32_t value,size_t num){
     return __b;
 }
     
-void* __memexch     (void* __a, void* __b, size_t size ){
+void* BLK_FUNC( Memory, exchange       )(void* __a, void* __b, size_t size ){
     uint8_t* a = __a;
     uint8_t* b = __b;
     while(size--){
@@ -475,7 +601,7 @@ void* __memexch     (void* __a, void* __b, size_t size ){
     return __b;
 }
 
-void* __memset_Area(void* __b,int value,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye){
+void* BLK_FUNC( Memory, setArea        )(void* __b,int value,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye){
     if(__b == NULL)
         return __b;
     
@@ -489,7 +615,7 @@ void* __memset_Area(void* __b,int value,size_t size,size_t nmenb_line,long xs,lo
     return __b;
 }
          
-void* __memcpy_Area(void* __restrict__ __dst,const void* __restrict__ __src,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye){
+void* BLK_FUNC( Memory, cpyArea        )(void* __restrict__ __dst,const void* __restrict__ __src,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye){
     if (__dst == NULL){
         return __dst;
     }
@@ -504,7 +630,7 @@ void* __memcpy_Area(void* __restrict__ __dst,const void* __restrict__ __src,size
     return __dst;
 }
 
-void* __memgrab_Area(void* __restrict__ __dst,const void* __restrict__ __src,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye){
+void* BLK_FUNC( Memory, grbArea        )(void* __restrict__ __dst,const void* __restrict__ __src,size_t size,size_t nmenb_line,long xs,long ys,long xe,long ye){
     __exitReturn( __dst==NULL || __src==NULL , NULL);
     __exitReturn( xs < 0 || xe < 0 || ys < 0 || ye < 0 , NULL);
 

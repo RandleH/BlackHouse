@@ -1,8 +1,6 @@
 
-
 #ifndef _RH_COMMON_H
 #define _RH_COMMON_H
-#define _BLACK_HOUSE_SUPPORT_
 
 #include <string.h>
 #include <stdlib.h>
@@ -18,7 +16,15 @@
 #include <complex.h>
 #include <assert.h>
 #include <errno.h>
-#include <alloca.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <time.h>
+
+#ifdef __x86_64
+#include <memory.h>
+#endif
+//#include <malloc.h>
+//#include "RH_config.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -28,18 +34,11 @@
  
 #define RH_DEBUG
  
-typedef enum{
-    kStatus_Success    ,
-    kStatus_Busy       ,
-    kStatus_BadAccess  ,
-    kStatus_Denied     ,
-    kStatus_Exist      ,
-    kStatus_NoSpace    ,
-    kStatus_ErrorID    ,
-    kStatus_NotFound   ,
-    kStatus_Warning    ,
-    kStatus_Empty
-}E_Status_t;
+
+#define RH_NULLABLE
+#define RH_NONNULL
+#define RH_ALLOCATED  
+
  
 struct __Region_t{
     int    xs;
@@ -50,16 +49,38 @@ struct __Region_t{
 typedef struct __Region_t __Region_t;
 typedef struct __Region_t __Area_t;
  
+struct __Range_t{
+    int   val;
+    int   max;
+    int   min;
+};
+typedef struct __Range_t __Range_t;
 
  
 #define RH_RESULT     __attribute__((warn_unused_result))
-#define RH_PREMAIN    __attribute__((constructor))
+#define RH_PREMAIN    //__attribute__((constructor))
 #define RH_AFTMAIN    __attribute__((destructor))
-#define RH_FUNCONST   __attribute__((const)) 
+#define RH_FUNCONST   __attribute__((const))
+#define RH_WEAK       __attribute__((weak))
+ 
  
 #ifndef __restrict__
 #define __restrict__ __restrict
 #endif
+ 
+#define MAKE_ENUM(name)  RH_ENUM_ ## name
+ typedef enum{
+     MAKE_ENUM( kStatus_Success   )    ,
+     MAKE_ENUM( kStatus_Busy      )    ,
+     MAKE_ENUM( kStatus_BadAccess )    ,
+     MAKE_ENUM( kStatus_Denied    )    ,
+     MAKE_ENUM( kStatus_Exist     )    ,
+     MAKE_ENUM( kStatus_NoSpace   )    ,
+     MAKE_ENUM( kStatus_ErrorID   )    ,
+     MAKE_ENUM( kStatus_NotFound  )    ,
+     MAKE_ENUM( kStatus_Warning   )    ,
+     MAKE_ENUM( kStatus_Empty     )
+ }E_Status_t;
  
 #define MAKE_FUNC( class , method )          __##class##_##method  // Function like this: __XXXX_xxxxx();
 #define CALL_FUNC                            MAKE_FUNC             // exactly the same but has semantic difference.
@@ -119,6 +140,10 @@ typedef struct __Region_t __Area_t;
 #ifndef M_ATAN_1_256
 #define M_ATAN_1_256  0.2238105003685                         /* arctan(1/256)  */
 #endif
+ 
+#ifndef M_MATH_SEED
+#define M_MATH_SEED   (0x3A97BFE0U)                           /* seed for random function */
+#endif
 
 
 typedef uint8_t                 u8;
@@ -142,11 +167,7 @@ typedef volatile uint32_t       vu32;
 typedef volatile uint64_t       vu64;
 
  
-#ifndef ASSERT
-  #define ASSERT( express )                    assert( express )
-#else
-  #error " 'ASSERT' has been defined. "
-#endif
+
  
 #ifndef __map
   #define __map(val,i_min,i_max,o_min,o_max)   (double)( ( ((double)o_max)*(((double)val)-((double)i_min))+((double)o_min)*((double)(i_max)-(double)(val)) )/((double)(i_max)-(double)(i_min)) )
@@ -165,29 +186,33 @@ typedef volatile uint64_t       vu64;
 #else
   #error " '__abs' has been defined. "
 #endif
-
-#ifndef __limit
-  #define __limit(a, lowerbound, upperbound)   (((a) >= (upperbound)) ? upperbound : (((a) <= (lowerbound)) ? (lowerbound) : (a) ))
-#else
-  #error " '__limit' has been defined. "
+ 
+#ifndef __roll
+  #define __roll(a, lowerbound, upperbound)    (((a) > (upperbound)) ? lowerbound : (((a) < (lowerbound)) ? (upperbound) : (a) ))
 #endif
 
-#ifndef __min
-  #define __min(a,b)                           (((a)<(b))?(a):(b))
+#ifndef RH_LIMIT
+  #define RH_LIMIT(a, lowerbound, upperbound)   (((a) >= (upperbound)) ? upperbound : (((a) <= (lowerbound)) ? (lowerbound) : (a) ))
+#else
+  #error " 'RH_LIMIT' has been defined. "
+#endif
+
+#ifndef RH_MIN
+  #define RH_MIN(a,b)                           (((a)<(b))?(a):(b))
 #else
   // #pragma message (" '__min' has been defined. ")
 #endif
 
-#ifndef __max
-  #define __max(a,b)                           (((a)>(b))?(a):(b))
+#ifndef RH_MAX
+  #define RH_MAX(a,b)                           (((a)>(b))?(a):(b))
 #else
   // #pragma message (" '__max' has been defined. ")
 #endif
 
-#ifndef __mid
-  #define __mid(a,b)                           (((a)<(b))?((a)+(((b)-(a)+1)>>1)):((b)+(((a)-(b)+1)>>1)) )
+#ifndef RH_MID
+  #define RH_MID(a,b)                           (((a)<(b))?((a)+(((b)-(a)+1)>>1)):((b)+(((a)-(b)+1)>>1)) )
 #else
-  #error " '__mid' has been defined. "
+  #error " 'RH_MID' has been defined. "
 #endif
  
 #ifndef __exit
@@ -220,26 +245,13 @@ typedef volatile uint64_t       vu64;
   #error " '__array2D' has been defined. "
 #endif
  
-void* RH_RESULT                                __RH_calloc(size_t count, size_t size);
-#ifndef __calloc
-  #define __calloc(x,size)                     __RH_calloc(x,size)
-#else
-  #error " '__calloc' has been defined. "
-#endif
 
-void* RH_RESULT                                __RH_malloc(size_t size);
-#ifndef __malloc
-  #define __malloc(x)                          __RH_malloc(x)//malloc(x)
-#else
-  #error " '__malloc' has been defined. "
-#endif
+#define RH_RECORD_TIME(func, print_func)({ clock_t cs = clock();func;clock_t ce = clock();print_func("RECORD_TIME:%ld\n",ce-cs); })
+#define __LOOP( cnt, things )({size_t _ = cnt;while(_--){things;}})
  
-void                                           __RH_free(void* ptr);
-#ifndef __free
-  #define __free(x)                            __RH_free(x)//free(x)
-#else
-  #error " '__free' has been defined. "
-#endif
+ 
+ 
+#define __BIT_GET( x , b )                   (((x)>>(b)) & 0x01   )
  
 #define __BIT_SET( x , b )                   ((x) | (   1<<(b)    ) )
 #define __BIT_CLR( x , b )                   ((x) & ( ~(1<<(b))   ) )
@@ -267,25 +279,87 @@ void                                           __RH_free(void* ptr);
       
 #define __INC_SAT( val )                     ( ( ((val)+1) > (val) ) ? ((val)+1) : (val) )
  
-#define __SET_STRUCT_MB( s_type, var_type, s_ptr, s_mem, val )   *( (var_type*) ( ((unsigned char*)(s_ptr))+(offsetof(s_type, s_mem)) ) ) = (var_type)(val)
+/*=========================================================================================================
+ * Force to set a member in struct
+ > s_type --- type name of your struct
+ > m_type --- type name of your member in this struct. You should NOT add "const" or any other declartion.
+ > s_ptr  --- pointer of this struct
+ > s_mem  --- member of this struct
+ > val    --- this value you want to set for this member
+ =========================================================================================================*/
+#define __SET_STRUCT_MB( s_type, m_type, s_ptr, s_mem, val )   *( (m_type*) ( ((unsigned char*)(s_ptr))+(offsetof(s_type, s_mem)) ) ) = (m_type)(val)
+ 
+/*=========================================================================================================
+ * Common utility for standard IO
+ > BYTE  --- 8   Bit
+ > WORD  --- 16  Bit
+ > DWORD --- 32  Bit
+ =========================================================================================================*/
 
-#define __IN_BYTE   ( port )                 ( *((volatile uint8_t*  )(port)) )
-#define __IN_WORD   ( port )                 ( *((volatile uint16_t* )(port)) )
-#define __IN_DWORD  ( port )                 ( *((volatile uint32_t* )(port)) )
+#define RH_IN_BYTE   ( port )                 ( *((volatile uint8_t*  )(port)) )
+#define RH_IN_WORD   ( port )                 ( *((volatile uint16_t* )(port)) )
+#define RH_IN_DWORD  ( port )                 ( *((volatile uint32_t* )(port)) )
 
-#define __IN_8BIT   ( port )                 __IN_BYTE  ( port )
-#define __IN_16BIT  ( port )                 __IN_WORD  ( port )
-#define __IN_32BIT  ( port )                 __IN_DWORD ( port )
+#define RH_IN_8BIT   ( port )                 RH_IN_BYTE  ( port )
+#define RH_IN_16BIT  ( port )                 RH_IN_WORD  ( port )
+#define RH_IN_32BIT  ( port )                 RH_IN_DWORD ( port )
       
-#define __OUT_BYTE  ( port, val )            ( *((volatile uint8_t*  )(port)) = ((uint8_t )(val)) )
-#define __OUT_WORD  ( port, val )            ( *((volatile uint16_t* )(port)) = ((uint16_t)(val)) )
-#define __OUT_DWORD ( port, val )            ( *((volatile uint32_t* )(port)) = ((uint32_t)(val)) )
+#define RH_OUT_BYTE  ( port, val )            ( *((volatile uint8_t*  )(port)) = ((uint8_t )(val)) )
+#define RH_OUT_WORD  ( port, val )            ( *((volatile uint16_t* )(port)) = ((uint16_t)(val)) )
+#define RH_OUT_DWORD ( port, val )            ( *((volatile uint32_t* )(port)) = ((uint32_t)(val)) )
 
-#define __OUT_8BIT  ( port, val )            __OUT_BYTE  ( port, val )
-#define __OUT_16BIT ( port, val )            __OUT_WORD  ( port, val )
-#define __OUT_32BIT ( port, val )            __OUT_DWORD ( port, val )
+#define RH_OUT_8BIT  ( port, val )            RH_OUT_BYTE  ( port, val )
+#define RH_OUT_16BIT ( port, val )            RH_OUT_WORD  ( port, val )
+#define RH_OUT_32BIT ( port, val )            RH_OUT_DWORD ( port, val )
+ 
+ 
+/*=========================================================================================================
+ * Common terminology for each project
+ > RH  --- General macro for all
+ > GLU --- Glucoo
+ > BLK --- Black House
+ > SMP --- Smart Pi
+ =========================================================================================================*/
 
+#define BLK_ENUM_MEMBER( name )              kBLK_##name
+#define GLU_ENUM_MEMBER( name )              kGLU_##name
+#define SMP_ENUM_MEMBER( name )              kSMP_##name
+ 
+#define BLK_GVAR( name )                     G_BLK_##name
+#define GLU_GVAR( name )                     G_GLU_##name
+#define SMP_GVAR( name )                     G_SMP_##name
 
+#define BLK_FUNC( class, method )            BLK_##class##_##method
+#define GLU_FUNC( class, method )            GLU_##class##_##method
+#define SMP_FUNC( class, method )            SMP_##class##_##method
+ 
+#define BLK_ENUM( enum )                     E_BLK_##enum##_t
+#define GLU_ENUM( enum )                     E_GLU_##enum##_t
+#define SMP_ENUM( enum )                     E_SMP_##enum##_t
+ 
+#define BLK_SRCT( class )                    S_BLK_##class##_t
+#define GLU_SRCT( class )                    S_GLU_##class##_t
+#define SMP_SRCT( class )                    S_SMP_##class##_t
+ 
+#define BLK_UION( union )                    U_BLK_##union##_t
+#define GLU_UION( union )                    U_GLU_##union##_t
+#define SMP_UION( union )                    U_SMP_##union##_t
+
+#define BLK_TYPE( type )                     T_BLK_##type##_t
+#define GLU_TYPE( type )                     T_GLU_##type##_t
+#define SMP_TYPE( type )                     T_SMP_##type##_t
+ 
+#if 0
+#error "Read the following tips and remove this error first."
+
+/*
+ * Be careful with the memory allocate function in each file.
+ *
+ *
+ */
+ 
+#endif
+ 
 #ifdef __cplusplus
  }
 #endif
