@@ -6,7 +6,8 @@ extern "C" {
     
 
 struct __GraphConfig_t{
-    BLK_TYPE(Pixel)    penColor;
+    BLK_UION(Pixel888) penColorRaw;
+    uint32_t           penColor;
     size_t             penSize;
     
     unsigned int       blur_br_100;
@@ -195,21 +196,15 @@ static struct __GraphConfig_t GCFG_copy = {0};
 E_Status_t      BLK_FUNC( Graph, init          )  (void){
     GCFG.blur_br_100 = 100;
     GCFG.blur_size   = 44100;
-    GCFG.penColor    = M_COLOR_WHITE;
     GCFG.penSize     = 3;
     
     GCFG.blur_tmp.pBuffer = NULL;
     GCFG.blur_tmp.height  = 0;
     GCFG.blur_tmp.width   = 0;
     
-    GCFG.callbacks[kBLK_RenderMethod_mark   ] = __render_24bit_mark    ;
-    GCFG.callbacks[kBLK_RenderMethod_unmark ] = __render_24bit_unmark  ;
-    GCFG.callbacks[kBLK_RenderMethod_fill   ] = __render_24bit_fill    ;
-    GCFG.callbacks[kBLK_RenderMethod_light  ] = __render_24bit_light   ;
-    GCFG.callbacks[kBLK_RenderMethod_depix  ] = __render_24bit_depix   ;
-    GCFG.callbacks[kBLK_RenderMethod_reverse] = __render_24bit_reverse ;
-    GCFG.callbacks[kBLK_RenderMethod_blur   ] = __render_24bit_blur    ;
-    GCFG.callbacks[kBLK_RenderMethod_eor    ] = __render_24bit_eor     ;
+    BLK_FUNC(Graph,set_color_depth)   ( kBLK_ColorDepth_24Bit  );
+    BLK_FUNC(Graph,set_penColor)      ( M_COLOR_WHITE          );
+    BLK_FUNC(Graph,set_render_method) ( kBLK_RenderMethod_fill );
     
     return MAKE_ENUM( kStatus_Success );
 }
@@ -220,15 +215,9 @@ void            BLK_FUNC( Graph, set_penSize   )  (size_t         penSize      )
     }
     GCFG.penSize = penSize;
 }
-void            BLK_FUNC( Graph, set_penColor  )  (BLK_TYPE(Pixel) penColor    ){
-#if   ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_BIN    )
-    if( penColor == 0 )
-        GCFG.penColor = 0x00;
-    else
-        GCFG.penColor = 0xff;
-#else
-    GCFG.penColor = penColor;
-#endif
+void            BLK_FUNC( Graph, set_penColor  )  (uint32_t penColor    ){
+
+    GCFG.penColorRaw.data = penColor;
 
     switch( GCFG.depth ){
         case kBLK_ColorDepth_1Bit :
@@ -259,6 +248,8 @@ void            BLK_FUNC( Graph, set_blurBr    )  (size_t         br_100       )
 }
 
 void            BLK_FUNC( Graph, set_color_depth   ) (BLK_ENUM(ColorDepth)   depth  ){
+    
+    GCFG.depth = depth;
     switch( depth ){
         case kBLK_ColorDepth_1Bit:
             GCFG.callbacks[kBLK_RenderMethod_mark   ] = __render_1bit_mark    ;
@@ -269,6 +260,7 @@ void            BLK_FUNC( Graph, set_color_depth   ) (BLK_ENUM(ColorDepth)   dep
             GCFG.callbacks[kBLK_RenderMethod_reverse] = __render_1bit_reverse ;
             GCFG.callbacks[kBLK_RenderMethod_blur   ] = __render_1bit_blur    ;
             GCFG.callbacks[kBLK_RenderMethod_eor    ] = __render_1bit_eor     ;
+            GCFG.penColor = MAKE_COLOR_1BIT(GCFG.penColorRaw.R, GCFG.penColorRaw.G, GCFG.penColorRaw.B);
             break;
         case kBLK_ColorDepth_8Bit:
             GCFG.callbacks[kBLK_RenderMethod_mark   ] = __render_8bit_mark    ;
@@ -279,6 +271,7 @@ void            BLK_FUNC( Graph, set_color_depth   ) (BLK_ENUM(ColorDepth)   dep
             GCFG.callbacks[kBLK_RenderMethod_reverse] = __render_8bit_reverse ;
             GCFG.callbacks[kBLK_RenderMethod_blur   ] = __render_8bit_blur    ;
             GCFG.callbacks[kBLK_RenderMethod_eor    ] = __render_8bit_eor     ;
+            BLK_GRAPH_ASSERT(0);
             break;
         case kBLK_ColorDepth_16Bit:
             GCFG.callbacks[kBLK_RenderMethod_mark   ] = __render_16bit_mark    ;
@@ -289,6 +282,7 @@ void            BLK_FUNC( Graph, set_color_depth   ) (BLK_ENUM(ColorDepth)   dep
             GCFG.callbacks[kBLK_RenderMethod_reverse] = __render_16bit_reverse ;
             GCFG.callbacks[kBLK_RenderMethod_blur   ] = __render_16bit_blur    ;
             GCFG.callbacks[kBLK_RenderMethod_eor    ] = __render_16bit_eor     ;
+            GCFG.penColor = MAKE_COLOR_16BIT(GCFG.penColorRaw.R, GCFG.penColorRaw.G, GCFG.penColorRaw.B);
             break;
         case kBLK_ColorDepth_24Bit:
             GCFG.callbacks[kBLK_RenderMethod_mark   ] = __render_24bit_mark    ;
@@ -299,6 +293,7 @@ void            BLK_FUNC( Graph, set_color_depth   ) (BLK_ENUM(ColorDepth)   dep
             GCFG.callbacks[kBLK_RenderMethod_reverse] = __render_24bit_reverse ;
             GCFG.callbacks[kBLK_RenderMethod_blur   ] = __render_24bit_blur    ;
             GCFG.callbacks[kBLK_RenderMethod_eor    ] = __render_24bit_eor     ;
+            GCFG.penColor = MAKE_COLOR_24BIT(GCFG.penColorRaw.R, GCFG.penColorRaw.G, GCFG.penColorRaw.B);
             break;
         case kBLK_ColorDepth_32Bit:
             break;
@@ -327,11 +322,13 @@ size_t          BLK_FUNC( Graph, get_blurBr   ) (void){
 static bool backupGCFG = false;
 void            BLK_FUNC( Graph, backupCache  ) (void){
     memcpy(&GCFG_copy, &GCFG, sizeof(struct __GraphConfig_t));
+    memcpy(GCFG_copy.callbacks, GCFG.callbacks, NUM_kBLK_RenderMethod);
     backupGCFG = true;
 }
 void            BLK_FUNC( Graph, restoreCache ) (void){
     if( backupGCFG ){
         memcpy(&GCFG, &GCFG_copy, sizeof(struct __GraphConfig_t));
+        memcpy(GCFG.callbacks, GCFG_copy.callbacks, NUM_kBLK_RenderMethod);
         backupGCFG = false;
     }
 }

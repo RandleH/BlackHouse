@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include "BLK_image.h"
+#include "BLK_graphic.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1585,6 +1586,10 @@ BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_aurora )
     
 BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_ )
 ( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
+    RH_ASSERT( dst          );
+    RH_ASSERT( dst->pBuffer );
+    RH_ASSERT( dst->height  );
+    RH_ASSERT( dst->width   );
     
     const int x0 = (int)dst->width>>1;
     const int y0 = (int)dst->height>>1;
@@ -1638,39 +1643,138 @@ BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_ )
     return dst;
 }
 
-static void applyMandelBrotPix_RGB888(int x,int y,int nIter, void* p){
-    BLK_SRCT(Img888)* dst = (BLK_SRCT(Img888)*)p;
-    if(nIter == -1)
-        nIter = 0;
-
-    nIter = RH_MIN( 0xff, nIter );
-
-    (dst->pBuffer + y*dst->width + x)->R = nIter;
-    (dst->pBuffer + y*dst->width + x)->G = nIter;
-    (dst->pBuffer + y*dst->width + x)->B = nIter;
-    
-}
-
-BLK_SRCT(Img888)*  BLK_FUNC( Img888, draw_img_mandelbrot )(  BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
-    return dst;
-}
-
     
 BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_radar )
 ( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
-
-//    int cx = (int)(dst->width>>1);
-//    int cy = (int)(dst->height>>1);
-//    
-//    int step = RH_LIMIT( (int)RH_MIN(dst->width, dst->height) / size, 5, (int)dst->width);
-//    
-//    int r = step*2;
+    RH_ASSERT( dst          );
+    RH_ASSERT( dst->pBuffer );
+    RH_ASSERT( dst->height  );
+    RH_ASSERT( dst->width   );
+    
+    int cx = (int)(dst->width>>1);
+    int cy = (int)(dst->height>>1);
+    
+    /* About this <type> : 通过平移, 将(x1,y1)移到原点, 此时(x2,y2)的位置决定type.
+    
+                      Y
+          *           |           *
+         (x0,y0)      |      (x1,y1)
+              *       |       *
+                *     |     *
+                  *   |   *
+                    * | *
+    ------------------+------------------ X
+                    * | *
+                  *   |   *
+                *     |     *
+              *       |       *
+         (x3,y3)      |       (x2,y2)
+          *           |           *
+     
+     */
+    
+    int x[4] = {0};
+    int y[4] = {0};
+    
+    x[0] = x[3] = RH_LIMIT( (int)(cx-cy),  0, cx);
+    x[1] = x[2] = RH_LIMIT( (int)(cx+cy), cx, (int)dst->width-1);
+    
+    y[0] = y[1] = RH_LIMIT( (int)(cy-cx),  0, cy);
+    y[2] = y[3] = RH_LIMIT( (int)(cy+cx), cy, (int)dst->height-1);
+    
+    int step = RH_LIMIT( (int)RH_MIN(dst->width, dst->height) / 10, 5, (int)dst->width);
+    
+    int r = step*2;
+    
+    if( !colors )
+        size = 0;
+    
+    if( size < 4 ){
+        BLK_TYPE(Pixel888)* temp = (BLK_TYPE(Pixel888)*)alloca(4);
+        memset(temp, 0xff, 4*sizeof(BLK_TYPE(Pixel888)));
+        memcpy(temp, colors, size*sizeof(BLK_TYPE(Pixel888)));
+        colors = temp;
+    }
     
     
+    BLK_FUNC(Graph,backupCache)();
+    BLK_FUNC(Graph,set_penSize       )( RH_LIMIT( step/9, 1, step ));
+    BLK_FUNC(Graph,set_penColor      )( M_COLOR_YELLOW );
+    BLK_FUNC(Graph,set_color_depth   )( kBLK_ColorDepth_24Bit  );
+    BLK_FUNC(Graph,set_render_method )( kBLK_RenderMethod_fill );
     
-    // while( r++ < RH_MAX( dst->width, dst->height ) ){
-    //     __img888_draw_circle_fill( cx, cy, r<<1, dst, )
-    // }
+    // 绘制45度斜线
+    BLK_FUNC(Graph,set_penColor      )( colors[2] );
+    BLK_FUNC(Graph,line_edged  )( x[0], y[0], x[2], y[2],               dst, NULL);
+    BLK_FUNC(Graph,line_edged  )( x[1], y[1], x[3], y[3],               dst, NULL);
+    
+    // 绘制靶心
+    BLK_FUNC(Graph,set_penColor      )( colors[0] );
+    BLK_FUNC(Graph,circle_fill )( cx, cy, step<<1,                      dst, NULL);
+    
+    // 绘制十字准心
+    BLK_FUNC(Graph,set_penColor      )( colors[1] );
+    BLK_FUNC(Graph,line_edged  )(   cx,    0,   cx, (int)dst->height-1, dst, NULL);
+    BLK_FUNC(Graph,line_edged  )(    0,   cy, (int)dst->width -1,   cy, dst, NULL);
+    
+    BLK_FUNC(Graph,set_penColor      )( colors[3] );
+    while( r < RH_MAX( dst->width, dst->height ) ){
+        BLK_FUNC(Graph,circle_edged)( cx, cy, r<<1, dst, NULL );
+        r+=step;
+    }
+    BLK_FUNC(Graph,restoreCache)();
+    return dst;
+}
+    
+BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_faded  )( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
+    RH_ASSERT( dst          );
+    RH_ASSERT( dst->pBuffer );
+    RH_ASSERT( dst->height  );
+    RH_ASSERT( dst->width   );
+    
+    BLK_UION(Pixel888)* p = dst->pBuffer;
+    // 染蓝色
+    for(int y=0; y<dst->height; y++){
+        for(int x=0; x<dst->width; x++,p++){
+            p->B =0x7e;
+        }
+    }
+    
+    // 染红色
+    p = dst->pBuffer;
+    int delta_x    = (int)( dst->width );
+    int delta_y    = (int)( 0xff );
+    int j = 0;
+    int e = 0;
+    for(int x=0; x<dst->width; x++,p++){
+        BLK_UION(Pixel888)* q = p;
+        for(int y=0; y<dst->height; y++,q+=dst->width){
+            q->R = j;
+        }
+        e += delta_y;
+        while( 2*( e + delta_y ) > delta_x){
+            j++;
+            e -= delta_x;
+        }
+    }
+    
+    // 染绿色
+    p = dst->pBuffer;
+    delta_x    = (int)( dst->height );
+    delta_y    = (int)( 0xff );
+    j = 0;
+    e = 0;
+    for(int y=0; y<dst->height; y++){
+        
+        for(int x=0; x<dst->width; x++,p++){
+            p->G = j;
+        }
+        e += delta_y;
+        while( 2*( e + delta_y ) > delta_x){
+            j++;
+            e -= delta_x;
+        }
+    }
     
     return dst;
 }
