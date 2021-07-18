@@ -1446,7 +1446,75 @@ E_Status_t      BLK_FUNC( Graph , capsule_fill      ) (int x1,int y1,int x2,int 
 }
     
     
+E_Status_t      BLK_FUNC( Graph , triangle_raw      ) (int x1,int y1,int x2,int y2,int x3,int y3, void*pIMG, F_Render RH_NULLABLE callback ){
+    BLK_FUNC(Graph,line_raw)( x1, y1, x2, y2, pIMG, callback );
+    BLK_FUNC(Graph,line_raw)( x2, y2, x3, y3, pIMG, callback );
+    return BLK_FUNC(Graph,line_raw)( x3, y3, x1, y1, pIMG, callback );
+}
     
+E_Status_t      BLK_FUNC( Graph , triangle_fill     ) (int x1,int y1,int x2,int y2,int x3,int y3, void*pIMG, F_Render RH_NULLABLE callback ){
+    
+    int xs = RH_MIN(x1, RH_MIN(x2, x3));
+    int xe = RH_MAX(x1, RH_MAX(x2, x3));
+    int ys = RH_MIN(y1, RH_MIN(y2, y3));
+    int ye = RH_MAX(y1, RH_MAX(y2, y3));
+    
+    long t_area = BLK_FUNC(Math,area_triangle)( x1,y1, x2,y2, x3,y3  );
+    
+    if( !callback ){
+        callback = GCFG.callbacks[ GCFG.method ];
+    }
+    BLK_FUNC( Graph , triangle_raw      )(x1,y1,x2,y2,x3,y3,pIMG,callback);
+    for( int y=ys; y<=ye; y++){
+        for( int x=xs; x<=xe; x++ ){
+            long p_area = BLK_FUNC(Math,area_triangle)( x,y, x1,y1, x2,y2  ) + \
+                          BLK_FUNC(Math,area_triangle)( x,y, x2,y2, x3,y3  ) + \
+                          BLK_FUNC(Math,area_triangle)( x,y, x1,y1, x3,y3  ) -6;
+            if( p_area <= t_area ){
+                callback(x,y,pIMG);
+            }
+        }
+    }
+    return MAKE_ENUM( kStatus_Success );
+}
+    
+void BLK_FUNC( Graph, demo )(void){
+    S_BLK_Img888_t* IMG = BLK_Img888_create(800, 480);
+    BLK_Graph_set_color_depth   ( kBLK_ColorDepth_24Bit  );
+    BLK_Graph_set_render_method ( kBLK_RenderMethod_fill );
+
+    BLK_Graph_set_penColor( M_COLOR_RED );
+    BLK_Graph_circle_fill     ( 400, 240,  39,      IMG, NULL );
+
+    BLK_Graph_set_penColor( M_COLOR_BLUE );
+    BLK_Graph_set_penSize (20);
+    BLK_Graph_rect_edged      (  30,  50, 130, 112, IMG, NULL );
+
+    BLK_Graph_set_penColor(M_COLOR_AQUA);
+    BLK_Graph_set_penSize (10);
+    BLK_Graph_rect_round_raw  ( 104, 178, 200, 234, IMG, NULL );
+
+    BLK_Graph_set_penColor(M_COLOR_RED);
+    BLK_Graph_rect_raw        ( 300, 240, 307, 270, IMG, NULL );
+    BLK_Graph_set_penColor(M_COLOR_AQUA);
+    BLK_Graph_capsule_fill    ( 300, 240, 307, 270, IMG, NULL );
+
+
+    BLK_Graph_set_penColor(M_COLOR_GREEN);
+    BLK_Graph_rect_raw        ( 300, 240, 407, 370, IMG, NULL );
+    BLK_Graph_rect_edged      ( 300, 240, 407, 370, IMG, NULL );
+    BLK_Graph_rect_fill       ( 300, 240, 407, 370, IMG, NULL );
+    BLK_Graph_rect_round_fill ( 300, 240, 407, 370, IMG, NULL );
+    BLK_Graph_rect_round_raw  ( 300, 240, 407, 370, IMG, NULL );
+
+    BLK_Graph_line_raw        ( 300, 240, 407, 370, IMG, NULL );
+    BLK_Graph_line_edged      ( 300, 240, 407, 370, IMG, NULL );
+    BLK_Graph_line_fill       ( 300, 240, 407, 370, IMG, NULL );
+    BLK_Graph_line_sausage    ( 300, 240, 407, 370, IMG, NULL );
+    
+    BLK_Img888_out_bmp("/Users/randle_h/Desktop/screen.bmp", IMG);
+    BLK_Img888_free(IMG);
+}
     
 #ifdef __cplusplus
 }

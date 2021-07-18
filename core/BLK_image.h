@@ -179,6 +179,8 @@ BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_radar  )( BLK_SRCT(Img888)* dst, co
 
 BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_faded  )( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size );
 
+BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_center )( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size );
+
 BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_ )( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size );
 
 #ifdef __cplusplus

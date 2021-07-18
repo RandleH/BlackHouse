@@ -7,14 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E32C1D7426A3D26000B6CBC7 /* RH_dummy.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D7326A3D26000B6CBC7 /* RH_dummy.c */; };
+		E32C1D8926A3D28000B6CBC7 /* BLK_math.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D7626A3D27F00B6CBC7 /* BLK_math.c */; };
+		E32C1D8A26A3D28000B6CBC7 /* BLK_graphic.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D7826A3D27F00B6CBC7 /* BLK_graphic.c */; };
+		E32C1D8B26A3D28000B6CBC7 /* BLK_image.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D7926A3D27F00B6CBC7 /* BLK_image.c */; };
+		E32C1D8C26A3D28000B6CBC7 /* BLK_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D7A26A3D27F00B6CBC7 /* BLK_lib.c */; };
+		E32C1D8D26A3D28000B6CBC7 /* BLK_poker.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D7F26A3D27F00B6CBC7 /* BLK_poker.c */; };
+		E32C1D8E26A3D28000B6CBC7 /* BLK_time.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D8026A3D27F00B6CBC7 /* BLK_time.c */; };
+		E32C1D8F26A3D28000B6CBC7 /* BLK_data.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D8126A3D28000B6CBC7 /* BLK_data.c */; };
+		E32C1D9026A3D28000B6CBC7 /* BLK_utility.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D8426A3D28000B6CBC7 /* BLK_utility.c */; };
+		E32C1D9126A3D28000B6CBC7 /* BLK_dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = E32C1D8526A3D28000B6CBC7 /* BLK_dsp.c */; };
 		E3CC872E25E92CCA00202EC4 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC872D25E92CCA00202EC4 /* main.c */; };
-		E3CC873825E92CEE00202EC4 /* RH_graphic.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC873625E92CEE00202EC4 /* RH_graphic.c */; };
-		E3CC874225E92D0100202EC4 /* RH_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC873A25E92D0100202EC4 /* RH_lib.c */; };
-		E3CC874325E92D0100202EC4 /* RH_math.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC873C25E92D0100202EC4 /* RH_math.c */; };
-		E3CC874425E92D0100202EC4 /* RH_image.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC874025E92D0100202EC4 /* RH_image.c */; };
-		E3CC874525E92D0100202EC4 /* RH_utility.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC874125E92D0100202EC4 /* RH_utility.c */; };
-		E3CC874C25E92D0A00202EC4 /* RH_data.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC874725E92D0A00202EC4 /* RH_data.c */; };
-		E3CC874D25E92D0A00202EC4 /* RH_dsp.c in Sources */ = {isa = PBXBuildFile; fileRef = E3CC874825E92D0A00202EC4 /* RH_dsp.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,28 +33,31 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E3A5F59025EB794A00B917B0 /* RH_dummy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = RH_dummy.c; path = ../RH_dummy.c; sourceTree = "<group>"; };
+		E32C1D6E26A3D22800B6CBC7 /* RH_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_common.h; path = ../RH_common.h; sourceTree = "<group>"; };
+		E32C1D6F26A3D22800B6CBC7 /* RH_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_color.h; path = ../RH_color.h; sourceTree = "<group>"; };
+		E32C1D7226A3D26000B6CBC7 /* RH_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_config.h; path = self/RH_config.h; sourceTree = "<group>"; };
+		E32C1D7326A3D26000B6CBC7 /* RH_dummy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_dummy.c; path = self/RH_dummy.c; sourceTree = "<group>"; };
+		E32C1D7626A3D27F00B6CBC7 /* BLK_math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_math.c; path = ../core/BLK_math.c; sourceTree = "<group>"; };
+		E32C1D7726A3D27F00B6CBC7 /* BLK_math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_math.h; path = ../core/BLK_math.h; sourceTree = "<group>"; };
+		E32C1D7826A3D27F00B6CBC7 /* BLK_graphic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_graphic.c; path = ../core/BLK_graphic.c; sourceTree = "<group>"; wrapsLines = 0; };
+		E32C1D7926A3D27F00B6CBC7 /* BLK_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_image.c; path = ../core/BLK_image.c; sourceTree = "<group>"; };
+		E32C1D7A26A3D27F00B6CBC7 /* BLK_lib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_lib.c; path = ../core/BLK_lib.c; sourceTree = "<group>"; };
+		E32C1D7B26A3D27F00B6CBC7 /* BLK_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_time.h; path = ../core/BLK_time.h; sourceTree = "<group>"; };
+		E32C1D7C26A3D27F00B6CBC7 /* BLK_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_lib.h; path = ../core/BLK_lib.h; sourceTree = "<group>"; };
+		E32C1D7D26A3D27F00B6CBC7 /* BLK_graphic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_graphic.h; path = ../core/BLK_graphic.h; sourceTree = "<group>"; };
+		E32C1D7E26A3D27F00B6CBC7 /* BLK_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_image.h; path = ../core/BLK_image.h; sourceTree = "<group>"; };
+		E32C1D7F26A3D27F00B6CBC7 /* BLK_poker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_poker.c; path = ../core/BLK_poker.c; sourceTree = "<group>"; };
+		E32C1D8026A3D27F00B6CBC7 /* BLK_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_time.c; path = ../core/BLK_time.c; sourceTree = "<group>"; };
+		E32C1D8126A3D28000B6CBC7 /* BLK_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_data.c; path = ../core/BLK_data.c; sourceTree = "<group>"; };
+		E32C1D8226A3D28000B6CBC7 /* BLK_utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_utility.h; path = ../core/BLK_utility.h; sourceTree = "<group>"; };
+		E32C1D8326A3D28000B6CBC7 /* BLK_personal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_personal.h; path = ../core/BLK_personal.h; sourceTree = "<group>"; };
+		E32C1D8426A3D28000B6CBC7 /* BLK_utility.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_utility.c; path = ../core/BLK_utility.c; sourceTree = "<group>"; };
+		E32C1D8526A3D28000B6CBC7 /* BLK_dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BLK_dsp.c; path = ../core/BLK_dsp.c; sourceTree = "<group>"; };
+		E32C1D8626A3D28000B6CBC7 /* BLK_poker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_poker.h; path = ../core/BLK_poker.h; sourceTree = "<group>"; };
+		E32C1D8726A3D28000B6CBC7 /* BLK_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_data.h; path = ../core/BLK_data.h; sourceTree = "<group>"; };
+		E32C1D8826A3D28000B6CBC7 /* BLK_dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLK_dsp.h; path = ../core/BLK_dsp.h; sourceTree = "<group>"; };
 		E3CC872A25E92CCA00202EC4 /* Xcode_12 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Xcode_12; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3CC872D25E92CCA00202EC4 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		E3CC873625E92CEE00202EC4 /* RH_graphic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_graphic.c; path = ../RH_graphic.c; sourceTree = "<group>"; };
-		E3CC873725E92CEE00202EC4 /* RH_graphic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_graphic.h; path = ../RH_graphic.h; sourceTree = "<group>"; };
-		E3CC873A25E92D0100202EC4 /* RH_lib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_lib.c; path = ../RH_lib.c; sourceTree = "<group>"; };
-		E3CC873B25E92D0100202EC4 /* RH_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_image.h; path = ../RH_image.h; sourceTree = "<group>"; };
-		E3CC873C25E92D0100202EC4 /* RH_math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_math.c; path = ../RH_math.c; sourceTree = "<group>"; };
-		E3CC873D25E92D0100202EC4 /* RH_utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_utility.h; path = ../RH_utility.h; sourceTree = "<group>"; };
-		E3CC873E25E92D0100202EC4 /* RH_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_lib.h; path = ../RH_lib.h; sourceTree = "<group>"; };
-		E3CC873F25E92D0100202EC4 /* RH_math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_math.h; path = ../RH_math.h; sourceTree = "<group>"; };
-		E3CC874025E92D0100202EC4 /* RH_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_image.c; path = ../RH_image.c; sourceTree = "<group>"; };
-		E3CC874125E92D0100202EC4 /* RH_utility.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_utility.c; path = ../RH_utility.c; sourceTree = "<group>"; };
-		E3CC874725E92D0A00202EC4 /* RH_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_data.c; path = ../RH_data.c; sourceTree = "<group>"; };
-		E3CC874825E92D0A00202EC4 /* RH_dsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RH_dsp.c; path = ../RH_dsp.c; sourceTree = "<group>"; };
-		E3CC874925E92D0A00202EC4 /* RH_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_data.h; path = ../RH_data.h; sourceTree = "<group>"; };
-		E3CC874A25E92D0A00202EC4 /* RH_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_common.h; path = ../RH_common.h; sourceTree = "<group>"; };
-		E3CC874B25E92D0A00202EC4 /* RH_dsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_dsp.h; path = ../RH_dsp.h; sourceTree = "<group>"; };
-		E3CC874F25E93E0000202EC4 /* RH_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_color.h; path = ../RH_color.h; sourceTree = "<group>"; };
-		E3CC875025E93E0000202EC4 /* RH_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RH_config.h; path = ../RH_config.h; sourceTree = "<group>"; };
-		E3F8E98725F281220009B2F2 /* RH_font.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RH_font.h; path = ../RH_font.h; sourceTree = "<group>"; };
-		E3F8E98825F281220009B2F2 /* RH_font.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = RH_font.c; path = ../RH_font.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +71,41 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E32C1D7026A3D23000B6CBC7 /* self */ = {
+			isa = PBXGroup;
+			children = (
+				E32C1D7226A3D26000B6CBC7 /* RH_config.h */,
+				E32C1D7326A3D26000B6CBC7 /* RH_dummy.c */,
+			);
+			name = self;
+			sourceTree = "<group>";
+		};
+		E32C1D7126A3D23700B6CBC7 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				E32C1D8126A3D28000B6CBC7 /* BLK_data.c */,
+				E32C1D8726A3D28000B6CBC7 /* BLK_data.h */,
+				E32C1D8526A3D28000B6CBC7 /* BLK_dsp.c */,
+				E32C1D8826A3D28000B6CBC7 /* BLK_dsp.h */,
+				E32C1D7826A3D27F00B6CBC7 /* BLK_graphic.c */,
+				E32C1D7D26A3D27F00B6CBC7 /* BLK_graphic.h */,
+				E32C1D7926A3D27F00B6CBC7 /* BLK_image.c */,
+				E32C1D7E26A3D27F00B6CBC7 /* BLK_image.h */,
+				E32C1D7A26A3D27F00B6CBC7 /* BLK_lib.c */,
+				E32C1D7C26A3D27F00B6CBC7 /* BLK_lib.h */,
+				E32C1D7626A3D27F00B6CBC7 /* BLK_math.c */,
+				E32C1D7726A3D27F00B6CBC7 /* BLK_math.h */,
+				E32C1D8326A3D28000B6CBC7 /* BLK_personal.h */,
+				E32C1D7F26A3D27F00B6CBC7 /* BLK_poker.c */,
+				E32C1D8626A3D28000B6CBC7 /* BLK_poker.h */,
+				E32C1D8026A3D27F00B6CBC7 /* BLK_time.c */,
+				E32C1D7B26A3D27F00B6CBC7 /* BLK_time.h */,
+				E32C1D8426A3D28000B6CBC7 /* BLK_utility.c */,
+				E32C1D8226A3D28000B6CBC7 /* BLK_utility.h */,
+			);
+			name = core;
+			sourceTree = "<group>";
+		};
 		E3CC872125E92CCA00202EC4 = {
 			isa = PBXGroup;
 			children = (
@@ -93,26 +134,10 @@
 		E3CC873525E92CDA00202EC4 /* BlackHouse */ = {
 			isa = PBXGroup;
 			children = (
-				E3F8E98825F281220009B2F2 /* RH_font.c */,
-				E3F8E98725F281220009B2F2 /* RH_font.h */,
-				E3A5F59025EB794A00B917B0 /* RH_dummy.c */,
-				E3CC874F25E93E0000202EC4 /* RH_color.h */,
-				E3CC875025E93E0000202EC4 /* RH_config.h */,
-				E3CC874A25E92D0A00202EC4 /* RH_common.h */,
-				E3CC874725E92D0A00202EC4 /* RH_data.c */,
-				E3CC874925E92D0A00202EC4 /* RH_data.h */,
-				E3CC874825E92D0A00202EC4 /* RH_dsp.c */,
-				E3CC874B25E92D0A00202EC4 /* RH_dsp.h */,
-				E3CC874025E92D0100202EC4 /* RH_image.c */,
-				E3CC873B25E92D0100202EC4 /* RH_image.h */,
-				E3CC873A25E92D0100202EC4 /* RH_lib.c */,
-				E3CC873E25E92D0100202EC4 /* RH_lib.h */,
-				E3CC873C25E92D0100202EC4 /* RH_math.c */,
-				E3CC873F25E92D0100202EC4 /* RH_math.h */,
-				E3CC874125E92D0100202EC4 /* RH_utility.c */,
-				E3CC873D25E92D0100202EC4 /* RH_utility.h */,
-				E3CC873625E92CEE00202EC4 /* RH_graphic.c */,
-				E3CC873725E92CEE00202EC4 /* RH_graphic.h */,
+				E32C1D6F26A3D22800B6CBC7 /* RH_color.h */,
+				E32C1D6E26A3D22800B6CBC7 /* RH_common.h */,
+				E32C1D7026A3D23000B6CBC7 /* self */,
+				E32C1D7126A3D23700B6CBC7 /* core */,
 			);
 			name = BlackHouse;
 			sourceTree = "<group>";
@@ -173,14 +198,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E3CC874525E92D0100202EC4 /* RH_utility.c in Sources */,
-				E3CC874D25E92D0A00202EC4 /* RH_dsp.c in Sources */,
-				E3CC874C25E92D0A00202EC4 /* RH_data.c in Sources */,
-				E3CC873825E92CEE00202EC4 /* RH_graphic.c in Sources */,
-				E3CC874325E92D0100202EC4 /* RH_math.c in Sources */,
-				E3CC874225E92D0100202EC4 /* RH_lib.c in Sources */,
-				E3CC874425E92D0100202EC4 /* RH_image.c in Sources */,
+				E32C1D9026A3D28000B6CBC7 /* BLK_utility.c in Sources */,
+				E32C1D8A26A3D28000B6CBC7 /* BLK_graphic.c in Sources */,
+				E32C1D9126A3D28000B6CBC7 /* BLK_dsp.c in Sources */,
+				E32C1D8C26A3D28000B6CBC7 /* BLK_lib.c in Sources */,
+				E32C1D8E26A3D28000B6CBC7 /* BLK_time.c in Sources */,
+				E32C1D7426A3D26000B6CBC7 /* RH_dummy.c in Sources */,
 				E3CC872E25E92CCA00202EC4 /* main.c in Sources */,
+				E32C1D8926A3D28000B6CBC7 /* BLK_math.c in Sources */,
+				E32C1D8F26A3D28000B6CBC7 /* BLK_data.c in Sources */,
+				E32C1D8D26A3D28000B6CBC7 /* BLK_poker.c in Sources */,
+				E32C1D8B26A3D28000B6CBC7 /* BLK_image.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

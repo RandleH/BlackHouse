@@ -115,8 +115,9 @@ E_Status_t      BLK_FUNC( Graph , quad_fill         ) (int x1,int y1,int x2,int 
 E_Status_t      BLK_FUNC( Graph , capsule_raw       ) (int xs,int ys,int xe,int ye, void* pIMG, F_Render RH_NULLABLE callback );
 E_Status_t      BLK_FUNC( Graph , capsule_fill      ) (int xs,int ys,int xe,int ye, void* pIMG, F_Render RH_NULLABLE callback );
 
-
-
+E_Status_t      BLK_FUNC( Graph , triangle_raw      ) (int x1,int y1,int x2,int y2,int x3,int y3, void*pIMG, F_Render RH_NULLABLE callback );
+E_Status_t      BLK_FUNC( Graph , triangle_fill     ) (int x1,int y1,int x2,int y2,int x3,int y3, void*pIMG, F_Render RH_NULLABLE callback );//
+E_Status_t      BLK_FUNC( Graph , triangle_edged    ) (int x1,int y1,int x2,int y2,int x3,int y3, void*pIMG, F_Render RH_NULLABLE callback );//
 
 #ifdef __cplusplus
 }

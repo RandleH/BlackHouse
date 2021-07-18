@@ -7,39 +7,36 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "RH_image.h"
-#include "RH_graphic.h"
+#include "BLK_image.h"
+#include "BLK_graphic.h"
 
-
-__UNION_PixelRGB888_t Screen_buffer[480][800] = {0};
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    printf("Hello, World!\n");
-
-    __GraphInfo_t BufferInfo = {    .pBuffer = Screen_buffer[0],
-                                    .height  = 480  ,
-                                    .width   = 800 };
-    
-//    __Graph_set_penColor(M_COLOR_SILVER);
-//    __Graph_rect_fill(0, 0, 799, 479, &BufferInfo, kApplyPixel_fill);
-//    __Graph_set_penColor(M_COLOR_PINK);
-//
-//    __Graph_set_penSize(18);
-//    __Graph_rect_edged(370, 0, 430, 479, &BufferInfo, kApplyPixel_blur);
-//
-//
-//    __Graph_circle_edged(400, 240, 101, &BufferInfo, kApplyPixel_blur);
-//
-//    __Graph_line_edged(40,40, 340, 90, &BufferInfo, kApplyPixel_fill);
-//
-//    __Graph_line_edged(300,40, 500, 40, &BufferInfo, kApplyPixel_fill);
-//    __Graph_line_edged(40,300, 40, 400, &BufferInfo, kApplyPixel_fill);
-//    __Graph_quad_fill(90, 90, 80, 300, 300, 70, 500, 400, &BufferInfo, kApplyPixel_fill);
-
-//    __ImgRGB888_out_bmp("/Users/randle_h/desktop/screen.bmp",&BufferInfo);
+    printf( "%lf\n", BLK_Gussian_func_2D_XY(200, 0, 133, 80, 0, 0)  );
     
     
     
+#if 1
+    S_BLK_Img888_t* IMG = BLK_Img888_create(800, 480);
+    BLK_TYPE(Pixel888) colors[4] = {
+        M_COLOR_RED,
+        M_COLOR_WHITE,
+        M_COLOR_DARKGRAY,
+        M_COLOR_DARKGRAY
+    };
+    
+    BLK_Img888_draw_img_center(IMG, colors, 4);
+    
+//    BLK_FUNC(Graph,set_penSize       )( 9 );
+//    BLK_FUNC(Graph,set_penColor      )( M_COLOR_YELLOW );
+//    BLK_FUNC(Graph,set_color_depth   )( kBLK_ColorDepth_24Bit  );
+//    BLK_FUNC(Graph,set_render_method )( kBLK_RenderMethod_fill );
+//
+//    BLK_Graph_triangle_fill       ( 300, 240, 407, 370, 120, 104, IMG, NULL );
+//
+    BLK_Img888_out_bmp("/Users/randle_h/Desktop/screen.bmp", IMG);
+    BLK_Img888_free(IMG);
+#endif
     return 0;
 }

@@ -1624,7 +1624,6 @@ BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_ )
         int ye = RH_MAX(y0, RH_MAX(cord[cnt].y, cord[cnt+1].y));
         
          // 填充三个点组成的三角形: (x0,y0) (cord[cnt].x, cord[cnt].y) (cord[cnt+1].x, cord[cnt+1].y)
-        
         for(int y=ys; y<=ye; y++){
             int x = xs;
 
@@ -1726,7 +1725,8 @@ BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_radar )
     return dst;
 }
     
-BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_faded  )( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
+BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_faded  )
+( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
     RH_ASSERT( dst          );
     RH_ASSERT( dst->pBuffer );
     RH_ASSERT( dst->height  );
@@ -1778,7 +1778,54 @@ BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_faded  )( BLK_SRCT(Img888)* dst, co
     
     return dst;
 }
+    
+BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_center )
+( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
+    
+    int miu_x = (int)dst->width>>1;
+    int miu_y = (int)dst->height>>1;
+    
+    int sig_x = (int)dst->width>>1;
+    int sig_y = (int)dst->height>>1;
+    
+    BLK_UION(Pixel888)* pIter = dst->pBuffer;
+    for( int y=0; y<dst->height; y++){
+        for( int x=0; x < dst->width; x++, pIter++){
+            float del = expf(-0.5*( ((x-miu_x)*(x-miu_x))/(float)(sig_x*sig_x) + ((y-miu_y)*(y-miu_y))/(float)(sig_y*sig_y) ));
+            BLK_GRAPH_ASSERT(del <= 1.0);
+            pIter->R = (uint8_t)roundf(0xff*del);
+            pIter->G = (uint8_t)roundf(0xff*del);
+            pIter->B = (uint8_t)roundf(0xff*del);
+            
+        }
+    }
 
+    return dst;
+}
+
+BLK_SRCT(Img888)* BLK_FUNC( Img888, draw_img_center1 )
+( BLK_SRCT(Img888)* dst, const BLK_TYPE(Pixel888)* colors, size_t size ){
+    
+    int miu_x = (int)dst->width>>1;
+    int miu_y = (int)dst->height>>1;
+    
+    int sig_x = (int)dst->width/6;
+    int sig_y = (int)dst->width/6;
+    
+    BLK_UION(Pixel888)* pIter = dst->pBuffer;
+    for( int y=0; y<dst->height; y++){
+        for( int x=0; x < dst->width; x++, pIter++){
+            float del = expf(-0.5*( ((x-miu_x)*(x-miu_x))/(sig_x*sig_x) + ((y-miu_y)*(y-miu_y))/(sig_y*sig_y) ));
+            BLK_GRAPH_ASSERT(del <= 1.0);
+            pIter->R = (uint8_t)roundf(0xff*del);
+            pIter->G = (uint8_t)roundf(0xff*del);
+            pIter->B = (uint8_t)roundf(0xff*del);
+            
+        }
+    }
+
+    return dst;
+}
 #ifdef __cplusplus
 }
 #endif
