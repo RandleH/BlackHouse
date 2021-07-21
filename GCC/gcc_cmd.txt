@@ -1,23 +1,21 @@
-gcc -c ../RH_lib.c      
-gcc -c ../RH_math.c     
-gcc -c ../RH_data.c     
-gcc -c ../RH_dsp.c      
-gcc -c ../RH_graphic.c  
-gcc -c ../RH_image.c    
-gcc -c ../RH_utility.c  
-gcc -c ../RH_time.c     
-gcc -c ../RH_neuron.c
+gcc -c ../core/BLK_lib.c      -I ../ -I ./self/        
+gcc -c ../core/BLK_math.c     -I ../ -I ./self/        
+gcc -c ../core/BLK_data.c     -I ../ -I ./self/        
+gcc -c ../core/BLK_dsp.c      -I ../ -I ./self/        
+gcc -c ../core/BLK_graphic.c  -I ../ -I ./self/        
+gcc -c ../core/BLK_image.c    -I ../ -I ./self/        
+gcc -c ../core/BLK_utility.c  -I ../ -I ./self/        
+gcc -c ../core/BLK_time.c     -I ../ -I ./self/     
+gcc -c ../core/BLK_poker.c    -I ../ -I ./self/    
 
-
-ar cr RH_lib.lib      ./RH_lib.o     
-ar cr RH_math.lib     ./RH_math.o    
-ar cr RH_data.lib     ./RH_data.o    
-ar cr RH_dsp.lib      ./RH_dsp.o     
-ar cr RH_graphic.lib  ./RH_graphic.o 
-ar cr RH_image.lib    ./RH_image.o   
-ar cr RH_utility.lib  ./RH_utility.o 
-ar cr RH_time.lib     ./RH_time.o    
-ar cr RH_neuron.lib   ./RH_neuron.o
-
+ar cr BLK_lib.lib      ./BLK_lib.o     
+ar cr BLK_math.lib     ./BLK_math.o    
+ar cr BLK_data.lib     ./BLK_data.o    
+ar cr BLK_dsp.lib      ./BLK_dsp.o     
+ar cr BLK_graphic.lib  ./BLK_graphic.o 
+ar cr BLK_image.lib    ./BLK_image.o   
+ar cr BLK_utility.lib  ./BLK_utility.o 
+ar cr BLK_time.lib     ./BLK_time.o    
+ar cr BLK_poker.lib    ./BLK_poker.o
 
 
