@@ -26,11 +26,24 @@
 //#include <malloc.h>
 //#include "RH_config.h"
 
+#include <alloca.h>
+#include <unistd.h>
+
 #ifdef __cplusplus
  extern "C" {
 #endif
- 
+
+#define RH_COM_RECORD_VERSION                 "RH_COMMON - 08/14/2021"
+
+
+
+#if defined ( __CC_ARM )
 #pragma anon_unions
+#endif
+ 
+#ifndef UNUSED
+#define UNUSED(x)    (void)(x)
+#endif
  
 #define RH_DEBUG
  
@@ -39,12 +52,14 @@
 #define RH_NONNULL
 #define RH_ALLOCATED  
 
+typedef int16_t var;    // 泛指数值, 具体随项目规模或实际设备
+typedef int num;
  
 struct __Region_t{
-    int    xs;
-    int    ys;
-    size_t width;
-    size_t height;
+    var    xs;
+    var    ys;
+    var    w;
+    var    h;
 };
 typedef struct __Region_t __Region_t;
 typedef struct __Region_t __Area_t;
@@ -58,15 +73,17 @@ typedef struct __Range_t __Range_t;
 
  
 #define RH_RESULT     __attribute__((warn_unused_result))
-#define RH_PREMAIN    //__attribute__((constructor))
+#define RH_PREMAIN    __attribute__((constructor))
 #define RH_AFTMAIN    __attribute__((destructor))
 #define RH_FUNCONST   __attribute__((const))
 #define RH_WEAK       __attribute__((weak))
  
- 
-#ifndef __restrict__
-#define __restrict__ __restrict
-#endif
+#define RH_RESTRICT   __restrict
+
+ extern const char* RH_DIR_PRJ;       // 当前项目路径
+ extern const char* RH_DIR_DESKTOP;
+ extern const char* RH_TIME;          // 最后的编译时间
+
  
 #define MAKE_ENUM(name)  RH_ENUM_ ## name
  typedef enum{
@@ -192,7 +209,7 @@ typedef volatile uint64_t       vu64;
 #endif
 
 #ifndef RH_LIMIT
-  #define RH_LIMIT(a, lowerbound, upperbound)   (((a) >= (upperbound)) ? upperbound : (((a) <= (lowerbound)) ? (lowerbound) : (a) ))
+  #define RH_LIMIT(a, lowerbound, upperbound)   ((((signed)(a)) >= ((signed)(upperbound))) ? upperbound : (((signed)(a) <= ((signed)(lowerbound))) ? (lowerbound) : (a) ))
 #else
   #error " 'RH_LIMIT' has been defined. "
 #endif

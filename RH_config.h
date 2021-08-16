@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#define RH_CFG_RECORD_VERSION
+#define RH_CFG_RECORD_VERSION                 "RH_CONFIG - 08/14/2021"
 
 #define RH_CFG_GRAPHIC_COLOR_BIN              (0U)                          // < option >
 #define RH_CFG_GRAPHIC_COLOR_RGB565           (1U)                          // < option >
