@@ -7,19 +7,21 @@
 extern "C" {
 #endif
 
-#define RH_CFG_RECORD_VERSION                 "RH_CONFIG - 08/14/2021"
+#define RH_CFG_RECORD_VERSION                 "RH_CONFIG - 09/17/2021"
 
 #define RH_CFG_GRAPHIC_COLOR_BIN              (0U)                          // < option >
 #define RH_CFG_GRAPHIC_COLOR_RGB565           (1U)                          // < option >
 #define RH_CFG_GRAPHIC_COLOR_RGB888           (2U)                          // < option >
-#define RH_CFG_GRAPHIC_COLOR_TYPE             RH_CFG_GRAPHIC_COLOR_RGB888   // < select > < above option >
+#define RH_CFG_GRAPHIC_COLOR_TYPE              2                            // < select > < above option >
+
+#define RH_CFG_GRAPHIC_MALLOC_CACHE           (1U)                          // < select > < 0=disable : 1=enable >
 
 #define RH_CFG_FONT_DATA_EXTERN_TTF           (0U)                          // < option >
 #define RH_CFG_FONT_DATA_LOCAL_ARRAY          (1U)                          // < option >
 #define RH_CFG_FONT_DATA_LOCAL_BITMAP         (2U)                          // < option >
 #define RH_CFG_FONT_DATA_TYPE                 (0U)                          // < select > < above option >
 
-#define RH_CFG_OUTPUT_FONT_PNG                (1U)                          // < select > < 0=disable : 1=enable >
+#define RH_CFG_OUTPUT_FONT_PNG                (0U)                          // < select > < 0=disable : 1=enable >
 
 #define RH_CFG_FONT_STYLE__CourierNew         (1U)                          // < select > < 0=disable : 1=enable >
 #define RH_CFG_FONT_STYLE__CourierNew_Italic  (1U)                          // < select > < 0=disable : 1=enable >
@@ -30,8 +32,8 @@ extern "C" {
 #define RH_CFG_FONT_STYLE__Optima             (1U)                          // < select > < 0=disable : 1=enable >
 #define RH_CFG_FONT_STYLE__Sign_Printer       (1U)                          // < select > < 0=disable : 1=enable >
 
-#define RH_CFG_SCREEN_HEIGHT                  (480U)                        // < select >
-#define RH_CFG_SCREEN_WIDTH                   (800U)                        // < select >
+#define RH_CFG_SCREEN_HEIGHT                  (1920U)                        // < select >
+#define RH_CFG_SCREEN_WIDTH                   (1920U)                        // < select >
 
 #define RH_CFG_GRAM_INTERNAL                  (0U)                          // < option >
 #define RH_CFG_GRAM_EXTADDR                   (1U)                          // < option >
@@ -43,6 +45,8 @@ extern "C" {
 #define RH_CFG_GRAM_SECTION                   "NonCacheable.init"           // <   ...  > < only useful when RH_CFG_GRAM_TYPE==RH_CFG_GRAM_EXTSECT >
 #define RH_CFG_GRAM_POINTER                   s_psBufferLcd                 // <   ...  > < only useful when RH_CFG_GRAM_TYPE==RH_CFG_GRAM_EXTPTR  >
 extern void* RH_CFG_GRAM_POINTER;
+
+
 
 #define RH_CFG_MALLOC_SIZE__NONE              ((1U)<<0)                     // < option >
 #define RH_CFG_MALLOC_SIZE__64B               ((1U)<<6)                     // < option > 
@@ -105,6 +109,10 @@ extern void* RH_CFG_GRAM_POINTER;
                                               }while(0)
 #endif
 
+#ifndef RH_MESSAGE
+#define RH_MESSAGE(format,...)                printf(format,##__VA_ARGS__)
+#endif
+
 #ifndef RH_CALLOC
   #define RH_CALLOC(x,size)                   calloc(x,size)//BLK_FUNC( Memory, debug_print )( BLK_FUNC( Memory, debug_calloc )(x,size,__FILE__,__LINE__,calloc), NULL )
 #else
@@ -119,34 +127,40 @@ extern void* RH_CFG_GRAM_POINTER;
   #error " 'RH_MALLOC' has been defined. "
 #endif
 
+#ifndef RH_REALLOC
+#define RH_REALLOC(p,s)                       realloc(p,s)
+#else
+  #error " 'RH_REALLOC' has been defined. "
+#endif
+
 #ifndef RH_FREE
   #define RH_FREE(x)                          free(x)//BLK_FUNC( Memory, debug_free )(x,free)
 #else
   #error " 'RH_FREE' has been defined. "
 #endif
 
-#define BLK_POKER_CALLOC(x,s)          calloc(x,s)
-#define BLK_POKER_MALLOC(x)            malloc(x)
-#define BLK_POKER_FREE(x)              free(x)
-#define BLK_POKER_ASSERT(expr)         assert(expr)
-
-#define BLK_DATA_CALLOC(x,s)           calloc(x,s)
-#define BLK_DATA_MALLOC(x)             malloc(x)
-#define BLK_DATA_FREE(x)               free(x)
-#define BLK_DATA_ASSERT(expr)          assert(expr)
-#define BLK_DATA_HASH_CALLOC(x,s)      calloc(x,s)
-#define BLK_DATA_HASH_MALLOC(x)        malloc(x)
-#define BLK_DATA_HASH_FREE(x)          free(x)
-
-#define BLK_DSP_CALLOC(x,s)            calloc(x,s)
-#define BLK_DSP_MALLOC(x)              malloc(x)
-#define BLK_DSP_FREE(x)                free(x)
-#define BLK_DSP_ASSERT(expr)           assert(expr)
-
-#define BLK_GRAPH_CALLOC(x,s)          calloc(x,s)
-#define BLK_GRAPH_MALLOC(x)            malloc(x)
-#define BLK_GRAPH_FREE(x)              free(x)
-#define BLK_GRAPH_ASSERT(expr)         assert(expr)
+#define BLK_POKER_CALLOC(x,s)                 calloc(x,s)
+#define BLK_POKER_MALLOC(x)                   malloc(x)
+#define BLK_POKER_FREE(x)                     free(x)
+#define BLK_POKER_ASSERT(expr)                assert(expr)
+       
+#define BLK_DATA_CALLOC(x,s)                  calloc(x,s)
+#define BLK_DATA_MALLOC(x)                    malloc(x)
+#define BLK_DATA_FREE(x)                      free(x)
+#define BLK_DATA_ASSERT(expr)                 assert(expr)
+#define BLK_DATA_HASH_CALLOC(x,s)             calloc(x,s)
+#define BLK_DATA_HASH_MALLOC(x)               malloc(x)
+#define BLK_DATA_HASH_FREE(x)                 free(x)
+       
+#define BLK_DSP_CALLOC(x,s)                   calloc(x,s)
+#define BLK_DSP_MALLOC(x)                     malloc(x)
+#define BLK_DSP_FREE(x)                       free(x)
+#define BLK_DSP_ASSERT(expr)                  assert(expr)
+       
+#define BLK_GRAPH_CALLOC(x,s)                 calloc(x,s)
+#define BLK_GRAPH_MALLOC(x)                   malloc(x)
+#define BLK_GRAPH_FREE(x)                     free(x)
+#define BLK_GRAPH_ASSERT(expr)                assert(expr)
 
 
 

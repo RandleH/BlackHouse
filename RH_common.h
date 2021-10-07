@@ -33,8 +33,7 @@
  extern "C" {
 #endif
 
-#define RH_COM_RECORD_VERSION                 "RH_COMMON - 08/14/2021"
-
+#define RH_COM_RECORD_VERSION                 "RH_COMMON - 08/18/2021"
 
 
 #if defined ( __CC_ARM )
@@ -44,13 +43,13 @@
 #ifndef UNUSED
 #define UNUSED(x)    (void)(x)
 #endif
- 
+
 #define RH_DEBUG
  
 
 #define RH_NULLABLE
 #define RH_NONNULL
-#define RH_ALLOCATED  
+#define RH_ALLOCATED
 
 typedef int16_t var;    // 泛指数值, 具体随项目规模或实际设备
 typedef int num;
@@ -79,8 +78,10 @@ typedef struct __Range_t __Range_t;
 #define RH_WEAK       __attribute__((weak))
  
 #define RH_RESTRICT   __restrict
+ 
+#define RH_PROTOTYPE  //__attribute__((deprecated))
 
- extern const char* RH_DIR_PRJ;       // 当前项目路径
+ extern const char* RH_DIR;           // 当前项目路径
  extern const char* RH_DIR_DESKTOP;
  extern const char* RH_TIME;          // 最后的编译时间
 
@@ -365,6 +366,10 @@ typedef volatile uint64_t       vu64;
 #define BLK_TYPE( type )                     T_BLK_##type##_t
 #define GLU_TYPE( type )                     T_GLU_##type##_t
 #define SMP_TYPE( type )                     T_SMP_##type##_t
+ 
+#define BLK_API
+#define GLU_API
+#define SMP_API
  
 #if 0
 #error "Read the following tips and remove this error first."

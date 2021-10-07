@@ -148,8 +148,8 @@ BLK_FUNC( Math, sigmold       )( double x ){
 long          
 BLK_FUNC( Math, factorial     )( long   x ){ 
     // [!] Limitation: x should be smaller than 20
-    __exitReturn(x<0, -1);
-    
+    __exitReturn(x<0 , -1);
+    __exitReturn(x==0,  1);
     long res = 1;
     while(--x){
         res*=(x+1);
@@ -176,7 +176,7 @@ BLK_FUNC( Math, fibonacci     )( long   n ){
 long
 BLK_FUNC( Math, gcd           )( long   a, long b  ){
    
-    #define THIS  BLK_FUNC(Math, gcd)
+#define THIS  BLK_FUNC(Math, gcd)
     
     if( b>a )
         __swap(a, b);
@@ -192,7 +192,7 @@ BLK_FUNC( Math, gcd           )( long   a, long b  ){
         else         return (long)(THIS(a-b , b   )    );
     }
     
-    #undef THIS
+#undef THIS
     
 }
 
@@ -337,7 +337,15 @@ BLK_FUNC( Math, area_rectangular )(int x1,int y1,int x2,int y2){
     return __abs((x2-x1)*(y2-y1));
 }
 
-
+float
+BLK_FUNC( Math, poisson          )( int xs, int xe, int lamda ){
+    float res = 0.0;
+    for( int i=xs; i<=xe; i++ ){
+        res += powf(lamda,i)/(float)BLK_FUNC(Math,factorial)(i);
+    }
+    res *= exp(-lamda);
+    return res;
+}
 
 double
 BLK_FUNC( Gussian, func_1D    )( long x,long __miu,double __sigma ){
@@ -488,6 +496,8 @@ BLK_FUNC( Mandelbrot, image   )( float complex center, int img_w, int img_h, flo
     (dst->ptr + (dst->h>>1)*dst->w + (dst->w>>1))->R = 0x00;
     (dst->ptr + (dst->h>>1)*dst->w + (dst->w>>1))->G = 0x00;
     (dst->ptr + (dst->h>>1)*dst->w + (dst->w>>1))->B = 0x00;
+
+    
 }
 
     

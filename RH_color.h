@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#define RH_COLOR_RECORD_VERSION            "RH_COLOR - 08/18/2021"
+
 #if ( RH_CFG_GRAPHIC_COLOR_TYPE == RH_CFG_GRAPHIC_COLOR_BIN    )
   #define REVERSE_COLOR( M_COLOR )         (((M_COLOR)==0)?(0xff):(0x00))
   
@@ -35,7 +37,7 @@ extern "C" {
   #define COLOR_MASK_GREEN                 0x0000FF00
   #define COLOR_MASK_BLUE                  0x000000FF
   
-  #define REVERSE_COLOR( M_COLOR )         (uint32_t)( (0x00FF0000-(M_COLOR)&(0x00FF0000)) | (0x0000FF00-(M_COLOR)&(0x0000FF00)) | (0x000000FF-(M_COLOR)&0x000000FF) )
+  #define REVERSE_COLOR( M_COLOR )         (uint32_t)( (0x00FF0000-((M_COLOR)&(0x00FF0000))) | (0x0000FF00-((M_COLOR)&(0x0000FF00))) | (0x000000FF-((M_COLOR)&0x000000FF)) )
 
   #define DARKEN_COLOR_1Bit(C)             (uint32_t)( ((((C)&COLOR_MASK_RED)>>1)&(COLOR_MASK_RED))|((((C)&COLOR_MASK_GREEN)>>1)&(COLOR_MASK_GREEN))|((((C)&COLOR_MASK_BLUE)>>1)&(COLOR_MASK_BLUE)) )
   #define DARKEN_COLOR_2Bit(C)             (uint32_t)( ((((C)&COLOR_MASK_RED)>>2)&(COLOR_MASK_RED))|((((C)&COLOR_MASK_GREEN)>>2)&(COLOR_MASK_GREEN))|((((C)&COLOR_MASK_BLUE)>>2)&(COLOR_MASK_BLUE)) )
@@ -48,6 +50,11 @@ extern "C" {
 #define MAKE_COLOR_16BIT(R_255,G_255,B_255)    (uint16_t)((((R_255)>>3)<<11)|(((G_255)>>2)<<5)|((B_255)>>3))
 #define MAKE_COLOR_24BIT(R_255,G_255,B_255)    (uint32_t)((((R_255)&0xff)<<16)|(((G_255)&0xff)<<8)|((B_255)&0xff))
 #define MAKE_COLOR                             MAKE_COLOR_24BIT
+
+#define COLOR_16BIT(color)                     (uint16_t)((0xf800&(((color)>>19)<<11)) | (0x07e0&(((color)>>10)<<5 )) | (0x001f&(((color)>>3 ))))
+#define COLOR_1BIT(color)                      ((color)==0)?((uint8_t)(0x00)):((uint8_t)(0xff))
+#define COLOR_24BIT(color)                     (uint32_t)((color)&0x00ffffff)
+
 
 // Standard
 #define M_COLOR_WHITE                        (MAKE_COLOR(255,255,255))  // 白色
