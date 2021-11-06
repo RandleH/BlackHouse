@@ -225,7 +225,8 @@ RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_dft            (const cvar x[], size_t len
 static cvar WN( size_t k,size_t N ){
     return cexpf(-I*2*M_PI*k/((float)N));
 }
-static cvar fft  ( const cvar x[], size_t k, size_t N ){
+static cvar cseq_fft  ( const cvar x[], size_t k, size_t N ){
+#define THIS cseq_fft
     if( N == 1 ){
         return x[0];
     }
@@ -237,29 +238,41 @@ static cvar fft  ( const cvar x[], size_t k, size_t N ){
         for( size_t m=0; m<(N>>1); m++){
             xx[m] = x[m] + x[m+(N>>1)];
         }
-        return fft ( &xx[0], k>>1, N>>1 );
+        return THIS ( &xx[0], k>>1, N>>1 );
     }else{
         // k is odd
         for( size_t m=0; m<(N>>1); m++){
             xx[m] = (x[m] - x[m+(N>>1)])*WN( m,N );
         }
-        return fft ( &xx[0], k>>1, N>>1 );
+        return THIS ( &xx[0], k>>1, N>>1 );
     }
-    
+#undef THIS
 }
     
-RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_fft            (const cvar x[], size_t len){
-    
+RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_cseq_fft       (const cvar x[], size_t len){
+#warning "Only available for radix-2"
     BLK_SRCT(Cseq) X = {0};
     X.D    = RH_MALLOC(len*sizeof(cvar));
     X.len  = len;
     
     for( size_t k=0; k<len; k++ ){
-        X.D[k] = fft(x, k, len);
+        X.D[k] = cseq_fft(x, k, len);
     }
     
     return X;
 }
+    
+RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_rseq_fft       (const rvar x[], size_t len){
+    
+    BLK_SRCT(Cseq) X = {0};
+    X.D    = RH_MALLOC(len*sizeof(cvar));
+    X.len  = len;
+    
+    
+    
+    return X;
+}
+
     
 RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_idft           (const cvar x[], size_t len){
     BLK_SRCT(Cseq) X = {0};

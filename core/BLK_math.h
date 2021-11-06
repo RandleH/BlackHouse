@@ -133,6 +133,15 @@ BLK_ENUM(PtPos)   BLK_FUNC( Math, pt_cord2D   )      (                          
 
 
 
+RH_PROTOTYPE float __BLK_Math_prb_possion         (int lmda,                         int xs, int xe);
+RH_PROTOTYPE float __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe);
+RH_PROTOTYPE float __BLK_Math_prb_geomatric       (float p,                          int xs, int xe);
+RH_PROTOTYPE float __BLK_Math_prb_hypergeomatric  (int N, int K, int n,              int xs, int xe);
+RH_PROTOTYPE float __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe);
+RH_PROTOTYPE float __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe);
+
+
+RH_PROTOTYPE float __BLK_Math_inf_entropy         (float p[], size_t nitems );
 
 #ifdef __cplusplus
 }

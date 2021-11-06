@@ -712,7 +712,76 @@ BLK_FUNC( Math, pt_triangle   )( int x1,int y1,int x2,int y2,int x3,int y3, int 
  #endif
 }
 
+
+
+
+
+RH_PROTOTYPE float __BLK_Math_prb_possion         (int lmda,                         int xs, int xe){
+    float res = 0.0;
+    for( int i=xs; i<=xe; i++ ){
+        res += powf(lmda,i)/(float)BLK_FUNC(Math,factorial)(i);
+    }
+    res *= exp(-lmda);
     
+    return res;
+}
+    
+RH_PROTOTYPE float __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe){
+    float res = 0.0;
+    
+    for( int x=xs; x<=xe; x++ ){
+        res += BLK_FUNC(Math,combinatorial)(n, x) * powf(p,x) * powf(1-p,n-x);
+    }
+    return res;
+}
+
+RH_PROTOTYPE float __BLK_Math_prb_geomatric       (float p,                          int xs, int xe){
+    float res = 0.0;
+    
+    for( int x=xs; x<=xe; x++ ){
+        res += p * powf(1-p,x-1);
+    }
+    return res;
+}
+
+RH_PROTOTYPE float __BLK_Math_prb_hypergeomatric  (int N, int K, int n,              int xs, int xe){
+    float res = 0.0;
+    
+    for( int x=xs; x<=xe && x<=K; x++ ){
+        res += BLK_FUNC(Math, combinatorial)(K,x) * BLK_FUNC(Math, combinatorial)(N-K,n-x) / BLK_FUNC(Math, combinatorial)(N,n);
+    }
+    return res;
+}
+
+RH_PROTOTYPE float __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe){
+    float res = 0.0;
+    
+    for( int x=xs; x<=xe; x++ ){
+        res += BLK_FUNC(Math,combinatorial)(r+x-1, r-1) * powf(p,r) * powf(1-p,x);
+    }
+    return res;
+}
+
+RH_PROTOTYPE float __BLK_Math_prb_exponential     (int lmda,                         int xs, int xe){
+    return (float)(expf(-xe*lmda) - expf(-xs*lmda));
+}
+
+RH_PROTOTYPE float __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe){
+    return (float)((float)(xe-xs)/(float)(b-a));
+}
+
+
+RH_PROTOTYPE float __BLK_Math_inf_entropy         (float p[], size_t nitems ){
+    float res = 0.0;
+    for(size_t i=0; i< nitems; i++){
+        if(p[i] == 0) continue;
+        res -= p[i]*log2f(p[i]);
+    }
+    return res;
+}
+
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -11,32 +11,36 @@
 
 
 
-static float hw04( int n ){
-    int k = 4+1;
-    float res = 0.0;
-    while(k--){
-        res += powf( (5.0/(float)n), k)/BLK_Math_factorial(k);
-    }
-    res *= expf(-5.0/(float)n);
-    
-    
-    return res;
-}
-
-static float poisson( int xs, int xe, int lamda ){
-    float res = 0.0;
-    for( int i=xs; i<=xe; i++ ){
-        res += powf(lamda,i)/(float)BLK_Math_factorial(i);
-    }
-    res *= exp(-lamda);
-    
-    return res;
-}
-
 int main(int argc, char const *argv[]){
 	/* code */
     
-    printf("%f\n",poisson( 0,5, 4));
+    
+    
+    float PX[] = {0.5,0.25,0.125,0.125};
+    float PY[] = {0.25,0.25,0.25,0.25};
+    
+    float PXY[4][4] ={
+        {0.125   ,0.0625 ,0.0625,0.25 },\
+        {0.0625  , 0.125 ,0.0625,   0 },\
+        {0.03125 ,0.03125,0.0625,   0 },\
+        {0.03125 ,0.03125,0.0625,   0}
+    };
+    
+    
+    for(int i=0; i< 4;i++){
+        for(int j=0;j<4;j++){
+            printf("%f\t", PXY[i][j]/(PX[i]*PY[j]));
+        }
+        printf("\n");
+    }
+    
+    float res = 0.0;
+    
+    for(int i=0;i<4;i++){
+        res+=__BLK_Math_inf_entropy(PXY[i],4 );
+    }
+    
+    printf("%f\n",res );
     
 	return 0;
 }

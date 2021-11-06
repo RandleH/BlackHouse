@@ -36,7 +36,7 @@ typedef struct BLK_SRCT(Cseq) BLK_SRCT(Cseq);
 RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_covl        (const cvar x[], size_t xlen, const cvar h[], size_t hlen);
 RH_PROTOTYPE BLK_SRCT(Rseq) __BLK_Dsp_dct         (const rvar x[], size_t len);
 RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_dft         (const cvar x[], size_t len);
-RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_fft         (const cvar x[], size_t len);//
+RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_cseq_fft    (const cvar x[], size_t len);
 RH_PROTOTYPE BLK_SRCT(Cseq) __BLK_Dsp_idft        (const cvar x[], size_t len);
 
 RH_PROTOTYPE BLK_SRCT(Rseq) __BLK_Dsp_cseq2rseq   (const cvar x[], size_t len);
