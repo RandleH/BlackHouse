@@ -15,32 +15,47 @@ int main(int argc, char const *argv[]){
 	/* code */
     
     
-    
-    float PX[] = {0.5,0.25,0.125,0.125};
-    float PY[] = {0.25,0.25,0.25,0.25};
-    
-    float PXY[4][4] ={
-        {0.125   ,0.0625 ,0.0625,0.25 },\
-        {0.0625  , 0.125 ,0.0625,   0 },\
-        {0.03125 ,0.03125,0.0625,   0 },\
-        {0.03125 ,0.03125,0.0625,   0}
+    const float U[][3] = {
+        { 1.0,0.0,1.0 }, // C
+        { 0.4,0.5,0.6 }, // D
+        { 0.3,0.0,0.1 }, // E
+        { 0.6,0.0,0.0 }, // F
+        { 0.3,0.3,0.3 }, // G
+        { 0.5,0.1,0.4 }, // H
+        { 0.5,0.9,0.6 }, // I
+        { 0.5,0.5,0.5 }  // M
     };
     
+    const char C[] = "CDEFGHIM";
     
-    for(int i=0; i< 4;i++){
-        for(int j=0;j<4;j++){
-            printf("%f\t", PXY[i][j]/(PX[i]*PY[j]));
-        }
-        printf("\n");
+    float V  [ sizeof(U)/sizeof(*U) ][3] = { 0 };
+    float E  [ sizeof(U)/sizeof(*U) ][3] = { 0 };
+    float CNT[ sizeof(U)/sizeof(*U) ]    = { 0 };
+    float DEG[ sizeof(U)/sizeof(*U) ]    = { 0 };
+    
+//    for( int i=0; i<8; i++ ){
+//        __BLK_Math_fuzzy_deg_not( U[i], V[i], 3);
+//        CNT[i] = __BLK_Math_fuzzy_count( U[i], 3);
+//        printf("[%c] = %f \t %f\t%f\n", C[i], V[i][0], V[i][1], V[i][2] );
+//    }
+    
+    printf("%f\n", __BLK_Math_fuzzy_equality(U[0], U[1], 3));
+    
+//    for(size_t i=0; i<8; i++){
+//        for( size_t j=0; j<8; j++ ){
+//            E[i][j] = __BLK_Math_fuzzy_subsethood(U[i], U[j], 3);
+//
+//            printf("%f\t", E[i][j]);
+//        }
+//        printf("\n");
+//    }
+    
+    
+    
+    for( int i=0; i<8; i++ ){
+        DEG[i] = __BLK_Math_fuzzy_degree( U[i], 3);
+        printf("[%c] = %f \n", C[i], DEG[i]);
     }
-    
-    float res = 0.0;
-    
-    for(int i=0;i<4;i++){
-        res+=__BLK_Math_inf_entropy(PXY[i],4 );
-    }
-    
-    printf("%f\n",res );
-    
+
 	return 0;
 }

@@ -3,7 +3,26 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "__BLK_Math_fuzzy_degree:BLK_math.c">
+         <PersistentStrings>
+            <PersistentString
+               value = "a">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "main:main.c">
+         <PersistentStrings>
+            <PersistentString
+               value = "U">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "__BLK_Math_fuzzy_deg_and:BLK_math.c">
+      </ContextState>
+      <ContextState
+         contextName = "__BLK_Math_fuzzy_subsethood:BLK_math.c">
       </ContextState>
       <ContextState
          contextName = "__BLK_Math_inf_entropy:BLK_math.c">

@@ -714,9 +714,7 @@ BLK_FUNC( Math, pt_triangle   )( int x1,int y1,int x2,int y2,int x3,int y3, int 
 
 
 
-
-
-RH_PROTOTYPE float __BLK_Math_prb_possion         (int lmda,                         int xs, int xe){
+RH_PROTOTYPE float   __BLK_Math_prb_possion         (int lmda,                         int xs, int xe){
     float res = 0.0;
     for( int i=xs; i<=xe; i++ ){
         res += powf(lmda,i)/(float)BLK_FUNC(Math,factorial)(i);
@@ -726,7 +724,7 @@ RH_PROTOTYPE float __BLK_Math_prb_possion         (int lmda,                    
     return res;
 }
     
-RH_PROTOTYPE float __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe){
+RH_PROTOTYPE float   __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe){
     float res = 0.0;
     
     for( int x=xs; x<=xe; x++ ){
@@ -735,7 +733,7 @@ RH_PROTOTYPE float __BLK_Math_prb_binormial       (int n, float p,              
     return res;
 }
 
-RH_PROTOTYPE float __BLK_Math_prb_geomatric       (float p,                          int xs, int xe){
+RH_PROTOTYPE float   __BLK_Math_prb_geomatric       (float p,                          int xs, int xe){
     float res = 0.0;
     
     for( int x=xs; x<=xe; x++ ){
@@ -744,7 +742,7 @@ RH_PROTOTYPE float __BLK_Math_prb_geomatric       (float p,                     
     return res;
 }
 
-RH_PROTOTYPE float __BLK_Math_prb_hypergeomatric  (int N, int K, int n,              int xs, int xe){
+RH_PROTOTYPE float   __BLK_Math_prb_hypergeomatric  (int N, int K, int n,              int xs, int xe){
     float res = 0.0;
     
     for( int x=xs; x<=xe && x<=K; x++ ){
@@ -753,7 +751,7 @@ RH_PROTOTYPE float __BLK_Math_prb_hypergeomatric  (int N, int K, int n,         
     return res;
 }
 
-RH_PROTOTYPE float __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe){
+RH_PROTOTYPE float   __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe){
     float res = 0.0;
     
     for( int x=xs; x<=xe; x++ ){
@@ -762,16 +760,16 @@ RH_PROTOTYPE float __BLK_Math_prb_negbinormial    (int r, float p,              
     return res;
 }
 
-RH_PROTOTYPE float __BLK_Math_prb_exponential     (int lmda,                         int xs, int xe){
+RH_PROTOTYPE float   __BLK_Math_prb_exponential     (int lmda,                         int xs, int xe){
     return (float)(expf(-xe*lmda) - expf(-xs*lmda));
 }
 
-RH_PROTOTYPE float __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe){
+RH_PROTOTYPE float   __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe){
     return (float)((float)(xe-xs)/(float)(b-a));
 }
 
 
-RH_PROTOTYPE float __BLK_Math_inf_entropy         (float p[], size_t nitems ){
+RH_PROTOTYPE float   __BLK_Math_inf_entropy         (float p[], size_t nitems ){
     float res = 0.0;
     for(size_t i=0; i< nitems; i++){
         if(p[i] == 0) continue;
@@ -779,6 +777,77 @@ RH_PROTOTYPE float __BLK_Math_inf_entropy         (float p[], size_t nitems ){
     }
     return res;
 }
+
+
+RH_PROTOTYPE float*  __BLK_Math_fuzzy_deg_and       (const float a[], const float b[], float r[], size_t cnt){
+    RH_ASSERT( a && b && r);
+    for( size_t i=0; i< cnt ;i++ ){
+        r[i] = RH_MIN(a[i], b[i]);
+    }
+    return r;
+}
+    
+RH_PROTOTYPE float*  __BLK_Math_fuzzy_deg_or        (const float a[], const float b[], float r[], size_t cnt){
+    RH_ASSERT( a && b && r);
+    for( size_t i=0; i< cnt ;i++ ){
+        r[i] = RH_MAX(a[i], b[i]);
+    }
+    return r;
+}
+    
+RH_PROTOTYPE float*  __BLK_Math_fuzzy_deg_not       (const float a[],                  float r[], size_t cnt){
+    RH_ASSERT( a && r);
+    for( size_t i=0; i< cnt ;i++ ){
+        r[i] = 1.0 - a[i];
+    }
+    return r;
+}
+
+RH_PROTOTYPE float   __BLK_Math_fuzzy_count         (const float a[],                             size_t cnt){
+    float res = 0.0;
+    for(size_t i=0; i< cnt; i++){
+        res += a[i];
+    }
+    return res;
+}
+
+RH_PROTOTYPE float   __BLK_Math_fuzzy_degree        (const float a[],                             size_t cnt){
+
+    float* tmp_1 = alloca(cnt*sizeof(float));
+    float* tmp_2 = alloca(cnt*sizeof(float));
+    float* tmp_3 = alloca(cnt*sizeof(float));
+    
+    
+#define SET_NOT ((float*)(__BLK_Math_fuzzy_deg_not(a,tmp_1,      cnt)))
+#define SET_OR  ((float*)(__BLK_Math_fuzzy_deg_or (a,tmp_1,tmp_2,cnt)))
+#define SET_AND ((float*)(__BLK_Math_fuzzy_deg_and(a,tmp_1,tmp_3,cnt)))
+    
+    tmp_1 = SET_NOT;
+    
+    float num = __BLK_Math_fuzzy_count(SET_AND, cnt);
+    float dum = __BLK_Math_fuzzy_count(SET_OR,cnt);
+    
+    return (float)(__BLK_Math_fuzzy_count(SET_AND, cnt) / __BLK_Math_fuzzy_count(SET_OR,cnt));
+}
+
+RH_PROTOTYPE float   __BLK_Math_fuzzy_equality      (const float a[], const float b[],            size_t cnt){
+    float* tmp = alloca(cnt*sizeof(float));
+    
+    float cnt_and = __BLK_Math_fuzzy_count( __BLK_Math_fuzzy_deg_and( a, b, tmp, cnt ), cnt );
+    float cnt_or  = __BLK_Math_fuzzy_count( __BLK_Math_fuzzy_deg_or ( a, b, tmp, cnt ), cnt );
+    
+    float res = 1.0/ ( 1.0/__BLK_Math_fuzzy_subsethood(a, b, cnt)+1.0/__BLK_Math_fuzzy_subsethood(b, a, cnt) - 1);
+    RH_ASSERT(res - (float)(cnt_and/cnt_or)<0.0000001);
+    
+    return (float)(cnt_and/cnt_or);
+}
+
+RH_PROTOTYPE float   __BLK_Math_fuzzy_subsethood    (const float a[], const float b[],            size_t cnt){
+    float *tmp = alloca(cnt*sizeof(float));
+    return (float)(  __BLK_Math_fuzzy_count( __BLK_Math_fuzzy_deg_and(a, b, tmp, cnt) , cnt)/__BLK_Math_fuzzy_count(a, cnt) );
+    
+}
+
 
 
 

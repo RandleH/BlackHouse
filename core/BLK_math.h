@@ -133,15 +133,26 @@ BLK_ENUM(PtPos)   BLK_FUNC( Math, pt_cord2D   )      (                          
 
 
 
-RH_PROTOTYPE float __BLK_Math_prb_possion         (int lmda,                         int xs, int xe);
-RH_PROTOTYPE float __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe);
-RH_PROTOTYPE float __BLK_Math_prb_geomatric       (float p,                          int xs, int xe);
-RH_PROTOTYPE float __BLK_Math_prb_hypergeomatric  (int N, int K, int n,              int xs, int xe);
-RH_PROTOTYPE float __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe);
-RH_PROTOTYPE float __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_possion         (int lmda,                         int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_geomatric       (float p,                          int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_hypergeomatric  (int N, int K, int n,              int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe);
 
 
-RH_PROTOTYPE float __BLK_Math_inf_entropy         (float p[], size_t nitems );
+RH_PROTOTYPE float  __BLK_Math_inf_entropy         (float p[], size_t nitems );
+
+RH_PROTOTYPE float* __BLK_Math_fuzzy_deg_and       (const float a[], const float b[], float r[], size_t cnt);
+RH_PROTOTYPE float* __BLK_Math_fuzzy_deg_or        (const float a[], const float b[], float r[], size_t cnt);
+RH_PROTOTYPE float* __BLK_Math_fuzzy_deg_not       (const float a[],                  float r[], size_t cnt);
+
+RH_PROTOTYPE float  __BLK_Math_fuzzy_count         (const float a[],                             size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_fuzzy_equality      (const float a[], const float b[],            size_t cnt);
+
+RH_PROTOTYPE float  __BLK_Math_fuzzy_subsethood    (const float a[], const float b[],            size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_fuzzy_degree        (const float a[],                             size_t cnt);
+
 
 #ifdef __cplusplus
 }
