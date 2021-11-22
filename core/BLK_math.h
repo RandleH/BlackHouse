@@ -131,14 +131,17 @@ BLK_ENUM(PtPos)   BLK_FUNC( Math, pt_citcle   )      (int xc,int yc,int r,      
 BLK_ENUM(PtPos)   BLK_FUNC( Math, pt_cord2D   )      (                                           int px,int py);
 
 
+RH_PROTOTYPE float  __BLK_Math_decibel             (float vo, float vi);
 
+RH_PROTOTYPE float  __BLK_Math_std_normal          (float x);
 
-RH_PROTOTYPE float  __BLK_Math_prb_possion         (int lmda,                         int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_possion         (float lmda,                       int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_geomatric       (float p,                          int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_hypergeomatric  (int N, int K, int n,              int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe);
+RH_PROTOTYPE float  __BLK_Math_prb_normal          (float mu, float sig,              int xs, int xe);
 
 
 RH_PROTOTYPE float  __BLK_Math_inf_entropy         (float p[], size_t nitems );
@@ -152,6 +155,9 @@ RH_PROTOTYPE float  __BLK_Math_fuzzy_equality      (const float a[], const float
 
 RH_PROTOTYPE float  __BLK_Math_fuzzy_subsethood    (const float a[], const float b[],            size_t cnt);
 RH_PROTOTYPE float  __BLK_Math_fuzzy_degree        (const float a[],                             size_t cnt);
+
+RH_PROTOTYPE float  __BLK_Math_decibel             (float vo, float vi);
+RH_PROTOTYPE float  __BLK_Math_stirling            (int   n);
 
 
 #ifdef __cplusplus

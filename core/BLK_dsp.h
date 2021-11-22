@@ -51,6 +51,8 @@ RH_PROTOTYPE void           __BLK_Dsp_cseq_free   (BLK_SRCT(Cseq) x);
 RH_PROTOTYPE void           __BLK_Dsp_rseq_print  (BLK_SRCT(Rseq) x, int (*print)(const char*,...) );
 RH_PROTOTYPE void           __BLK_Dsp_cseq_print  (BLK_SRCT(Cseq) x, int (*print)(const char*,...) );
 
+
+
 #ifdef __cplusplus
 }
 #endif
