@@ -713,6 +713,8 @@ BLK_FUNC( Math, pt_triangle   )( int x1,int y1,int x2,int y2,int x3,int y3, int 
 
 
 
+
+
 static float __blk_std_normal_table[] = {
 //         .00      .01      .02      .03      .04      .05      .06      .07      .08      .09
 /* -3.9 */ 0.00005, 0.00005, 0.00004, 0.00004, 0.00004, 0.00004, 0.00004, 0.00004, 0.00003, 0.00003,\
@@ -778,6 +780,54 @@ RH_PROTOTYPE float   __BLK_Math_std_normal          (float x){
         
     if( rev )  return (float)(1.0f-__blk_std_normal_table[ (39-j)*10+i ]);
                return              __blk_std_normal_table[ (39-j)*10+i ];
+}
+
+RH_PROTOTYPE float   __BLK_Math_std_normal_rev      (float prob){
+    if(prob >  1.0) return INFINITY;
+    if(prob <= 0.0) return -4.0;
+    
+    bool rev = false;
+    if(prob >  0.5){
+        prob = 1-prob;
+        rev = true;
+    }
+    
+    size_t x=5,y=20;
+    
+    // Find Y
+        size_t u=0,d=39;
+        while( d-u>1 ){
+            if( __blk_std_normal_table[ y*10 ] > prob ){
+                d = y;
+                y = (u+d)/2;
+            }else{
+                u = y;
+                y = (u+d)/2;
+            }
+        }
+        RH_ASSERT(y==u);
+        if( __blk_std_normal_table[ u*10 ] < prob ){
+            y = d;
+        }
+    
+    // Find X
+    size_t l=0,r=9;
+    while( r-l>1 ){
+        if( __blk_std_normal_table[ y*10+x ] > prob ){
+            l = x;
+            x = (l+r)/2;
+        }else{
+            r = x;
+            x = (l+r)/2;
+        }
+    }
+    
+    printf("%f\n",__blk_std_normal_table[ y*10+x ]);
+    if( rev )
+        return (float)(3.9-0.1*(float)y+0.01*(float)x);
+    
+    
+    return (float)(0.1*(float)y-3.9 - 0.01*(float)x);
 }
 
 RH_PROTOTYPE float   __BLK_Math_prb_possion         (float lmda,                       int xs, int xe){
@@ -965,6 +1015,124 @@ RH_PROTOTYPE float   __BLK_Math_decibel             (float vo, float vi){
 RH_PROTOTYPE float   __BLK_Math_stirling            (int   n){
     return sqrtf(2*M_2_PI*n)*pow(n/M_E, n);
 }
+
+
+RH_PROTOTYPE float   __BLK_Math_stat_sample_mean    (const float a[], size_t cnt){
+    RH_ASSERT( a );
+    float mean = 0.0;
+    size_t i=cnt;
+    while(i--){
+        mean += *a++;
+    }
+    return (float)(mean/(float)(cnt));
+}
+
+RH_PROTOTYPE float   __BLK_Math_stat_sample_var     (const float a[], size_t cnt){
+    RH_ASSERT( a );
+    float mean = __BLK_Math_stat_sample_mean(a,cnt);
+    float dev  = 0.0;
+    size_t i=cnt;
+    while(i--){
+        dev += ( *a - mean )*( *a - mean );
+        a++;
+    }
+    return (float)( dev / (float)(cnt-1));
+}
+
+RH_PROTOTYPE float   __BLK_Math_stat_sample_stddevi (const float a[], size_t cnt){
+    RH_ASSERT( a );
+    return (float)sqrtf( __BLK_Math_stat_sample_var(a,cnt) );
+}
+
+RH_PROTOTYPE float   __BLK_Math_stat_sample_covar   (const float a[], const float b[], size_t cnt){
+    RH_ASSERT( a&&b );
+    
+    float a_ = __BLK_Math_stat_sample_mean(a, cnt);
+    float b_ = __BLK_Math_stat_sample_mean(b, cnt);
+    
+    float cov = 0.0;
+    float tmp = 0.0;
+    float i   = cnt;
+    while( i-- ){
+        if( tmp + ( *a-a_ )*( *b-b_ ) > LLONG_MAX ){
+            cov += tmp/(float)(cnt);
+            tmp  = ( *a++ -a_ )*( *b++ -b_ );
+        }else{
+            tmp += ( *a++ -a_ )*( *b++ -b_ );
+        }
+    }
+    return (cov+(float)(tmp/(float)(cnt-1)));
+}
+
+RH_PROTOTYPE float   __BLK_Math_stat_pop_var        (const float a[], size_t cnt){
+    RH_ASSERT( a );
+    
+    float mean = __BLK_Math_stat_sample_mean(a,cnt);
+    float dev  = 0.0;
+    size_t i=cnt;
+    while(i--){
+        dev += ( *a - mean )*( *a - mean );
+        a++;
+    }
+    return (float)( dev / (float)(cnt));
+}
+
+RH_PROTOTYPE float   __BLK_Math_stat_pop_stddevi    (const float a[], size_t cnt){
+    RH_ASSERT( a );
+    return (float)sqrtf( __BLK_Math_stat_pop_var(a,cnt) );
+}
+
+RH_PROTOTYPE float   __BLK_Math_stat_pop_covar      (const float a[], const float b[], size_t cnt){
+    RH_ASSERT( a&&b );
+    
+    float a_ = __BLK_Math_stat_sample_mean(a, cnt);
+    float b_ = __BLK_Math_stat_sample_mean(b, cnt);
+    
+    float cov = 0.0;
+    float tmp = 0.0;
+    size_t i  = cnt;
+    while( i-- ){
+        if( tmp + ( *a-a_ )*( *b-b_ ) > LLONG_MAX ){
+            cov += tmp/(float)(cnt);
+            tmp  = ( *a++ -a_ )*( *b++ -b_ );
+        }else{
+            tmp += ( *a++ -a_ )*( *b++ -b_ );
+        }
+    }
+
+    return (cov+(float)(tmp/(float)cnt));
+}
+
+RH_PROTOTYPE float   __BLK_Math_stat_pop_corr       (const float a[], const float b[], size_t cnt){
+    RH_ASSERT( a&&b );
+    
+    float covar = __BLK_Math_stat_pop_covar ( a, b, cnt );
+    float var_X = __BLK_Math_stat_pop_var   ( a, cnt );
+    float var_Y = __BLK_Math_stat_pop_var   ( b, cnt );
+    
+    return covar/(var_X*var_Y);
+}
+
+RH_PROTOTYPE void    __BLK_Math_stat_linear_regre   (const float x[], const float y[], size_t cnt, float *k, float *b ){
+    RH_ASSERT( x&&y );
+    RH_ASSERT( k&&b );
+    
+    *k = __BLK_Math_stat_pop_covar   ( x, y, cnt) / __BLK_Math_stat_pop_var( x, cnt);
+    *b = __BLK_Math_stat_sample_mean ( y   , cnt) - (*k)*__BLK_Math_stat_sample_mean( x, cnt);
+    
+}
+
+
+RH_PROTOTYPE void    __BLK_Math_stat_confi_interval (float mean, float sig, int n, float prob,   float *cs, float *ce){
+    RH_ASSERT( cs&&ce );
+    float z = __BLK_Math_std_normal_rev( (1.0+prob)/2.0 );
+    
+    float eps = ( z*sig )/(sqrtf(n));
+    
+    *cs  = mean - eps;
+    *ce  = mean + eps;
+}
+
 
 #ifdef __cplusplus
 }

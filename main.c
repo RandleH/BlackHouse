@@ -7,28 +7,21 @@
 #include "BLK_dsp.h"
 #include "BLK_math.h"
 
-float price( float S, float F, float tau, float rate, float sig ){
-    float d1 = (logf(S/F)+( rate+sig*sig/2.0 )*tau) / (sig*sqrtf(tau));
-    float d2 = d1-sig*sqrtf(tau);
-    
-#define N __BLK_Math_std_normal
-    
-    return S* N(d1) - F*expf(-rate*tau)*N(d2);
-    
-#undef N
-    
-}
+#include "BLK_lib.h"
+
 
 
 int main(int argc, char const *argv[]){
 	/* code */
+
+
+    float cs, ce;
+    __BLK_Math_stat_confi_interval( 58.11, 6, 49, 0.95, &cs, &ce);
+    printf( "[%f,%f]\n", cs, ce);
     
+//    float_t a = 0.12;
+//    for(int i=0; i<10; i++, a+=0.01)
+//        printf("%s\n", BLK_Bin_ftoa(a) );
     
-    
-    printf("%f\n", price( 47, 45, 183.0/365.0, 0.1, 0.25 ) );
-    
-    for (float r=0.1; r<1.0; r+= 0.1)
-        printf("%f\n", price( 47, 45, 183.0/365.0, r, 0.4 ) );
-    
-	return 0;
+    return 0;
 }

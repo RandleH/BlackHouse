@@ -134,6 +134,7 @@ BLK_ENUM(PtPos)   BLK_FUNC( Math, pt_cord2D   )      (                          
 RH_PROTOTYPE float  __BLK_Math_decibel             (float vo, float vi);
 
 RH_PROTOTYPE float  __BLK_Math_std_normal          (float x);
+RH_PROTOTYPE float  __BLK_Math_std_normal_rev      (float prob);
 
 RH_PROTOTYPE float  __BLK_Math_prb_possion         (float lmda,                       int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_binormial       (int n, float p,                   int xs, int xe);
@@ -142,7 +143,6 @@ RH_PROTOTYPE float  __BLK_Math_prb_hypergeomatric  (int N, int K, int n,        
 RH_PROTOTYPE float  __BLK_Math_prb_negbinormial    (int r, float p,                   int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_uniform         (int a, int b,                     int xs, int xe);
 RH_PROTOTYPE float  __BLK_Math_prb_normal          (float mu, float sig,              int xs, int xe);
-
 
 RH_PROTOTYPE float  __BLK_Math_inf_entropy         (float p[], size_t nitems );
 
@@ -159,6 +159,19 @@ RH_PROTOTYPE float  __BLK_Math_fuzzy_degree        (const float a[],            
 RH_PROTOTYPE float  __BLK_Math_decibel             (float vo, float vi);
 RH_PROTOTYPE float  __BLK_Math_stirling            (int   n);
 
+RH_PROTOTYPE float  __BLK_Math_stat_sample_mean    (const float a[],                  size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_stat_sample_var     (const float a[],                  size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_stat_sample_stddevi (const float a[],                  size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_stat_sample_covar   (const float a[], const float b[], size_t cnt);
+
+RH_PROTOTYPE float  __BLK_Math_stat_pop_var        (const float a[], size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_stat_pop_stddevi    (const float a[], size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_stat_pop_covar      (const float a[], const float b[], size_t cnt);
+RH_PROTOTYPE float  __BLK_Math_stat_pop_corr       (const float a[], const float b[], size_t cnt);
+
+RH_PROTOTYPE void   __BLK_Math_stat_linear_regre   (const float x[], const float y[], size_t cnt, float *k, float *b );
+
+RH_PROTOTYPE void   __BLK_Math_stat_confi_interval (float mean, float sig, int n, float prob,   float *cs, float *ce);
 
 #ifdef __cplusplus
 }
